@@ -1,0 +1,66 @@
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Build outputs
+target/
+build/
+out/
+
+# Maven wrapper (keep the jar ignored)
+.mvn/wrapper/maven-wrapper.jar
+
+# IDEs and editors
+.idea/
+*.iml
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Eclipse
+.settings/
+.classpath
+.project
+.factorypath
+
+# NetBeans
+nbproject/private/
+
+# Gradle
+.gradle/
+build/
+
+# Java
+*.class
+*.log
+*.tmp
+*.cache
+
+# Packaged artifacts (usually in target/)
+*.jar
+*.war
+*.ear
+
+# Test / coverage reports
+coverage/
+*.lcov
+jacoco.exec
+target/site/
+
+# Node/npm (if frontend assets present)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment/config
+.env
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Misc editor swap / backup files
+*~
+*.swp
+*.swo
