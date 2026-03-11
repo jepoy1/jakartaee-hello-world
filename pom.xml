@@ -21,6 +21,7 @@
         <jakartaee-api.version>11.0.0-RC1</jakartaee-api.version>
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
         <war-plugin.version>3.4.0</war-plugin.version>
+        <wildfly-maven-plugin.version>5.1.5.Final</wildfly-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -47,6 +48,11 @@
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${wildfly-maven-plugin.version}</version>
             </plugin>
 
         </plugins>
