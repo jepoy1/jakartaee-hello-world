@@ -19,6 +19,7 @@
         <project.report.sourceEncoding>UTF-8</project.report.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
         <jakartaee-api.version>11.0.0-RC1</jakartaee-api.version>
+        <jakarta.persistence-api.version>3.2.0</jakarta.persistence-api.version>
         <compiler-plugin.version>3.13.0</compiler-plugin.version>
         <war-plugin.version>3.4.0</war-plugin.version>
         <wildfly-maven-plugin.version>5.1.5.Final</wildfly-maven-plugin.version>
@@ -27,8 +28,20 @@
     <dependencies>
         <dependency>
             <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>10.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-core-api</artifactId>
             <version>${jakartaee-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.persistence</groupId>
+            <artifactId>jakarta.persistence-api</artifactId>
+            <version>${jakarta.persistence-api.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
