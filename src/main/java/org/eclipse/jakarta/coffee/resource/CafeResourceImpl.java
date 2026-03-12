@@ -1,8 +1,8 @@
 package org.eclipse.jakarta.coffee.resource;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.eclipse.jakarta.coffee.mapper.CoffeeMapper;
 import org.eclipse.jakarta.coffee.repository.CafeRepository;
 import org.eclipse.jakarta.generated.api.RestApi;
 import org.eclipse.jakarta.generated.model.CoffeeDTO;
@@ -22,18 +22,13 @@ public class CafeResourceImpl implements RestApi {
     @Inject
     CafeRepository cafeRepository;
 
+    @Inject
+    CoffeeMapper coffeeMapper;
+
     @GET
     @Override
     public List<CoffeeDTO> listCoffees() {
-        return cafeRepository.findAll()
-            .stream()
-            .map(coffee -> {
-                CoffeeDTO dto = new CoffeeDTO();
-                dto.setId(coffee.getId());
-                dto.setName(coffee.getName());
-                dto.setPrice(coffee.getPrice());
-                return dto;
-            }).collect(Collectors.toList());
+        return coffeeMapper.toDtoList(cafeRepository.findAll());
     }   
     
 }
