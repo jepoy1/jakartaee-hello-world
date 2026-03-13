@@ -13,11 +13,9 @@ import org.mapstruct.Mapping;
 public interface PurchaseOrderMapper {
 
     @Mapping(source = "customer.name", target = "customerName")
-    @Mapping(source = "deliveryStatus", target = "deliveryStatus")
     PurchaseOrderDTO toDto(PurchaseOrder purchaseOrder);
 
     @Mapping(source = "customer.name", target = "customerName")
-    @Mapping(source = "deliveryStatus", target = "deliveryStatus")
     List<PurchaseOrderDTO> toDtoList(List<PurchaseOrder> purchaseOrders);
 
     @Mapping(source = "product.id", target = "productId")

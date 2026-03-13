@@ -40,7 +40,6 @@ paths:
                       orderNumber: PO-2026-0001
                       customerName: Acme Trading
                       orderDate: '2026-03-01'
-                      deliveryStatus: APPROVED
                       paymentStatus: FULLY_PAID
                       items:
                         - productName: Laptop Dock
@@ -53,7 +52,6 @@ paths:
                       orderNumber: PO-2026-0002
                       customerName: Blue River Supplies
                       orderDate: '2026-03-05'
-                      deliveryStatus: PENDING
                       paymentStatus: ONGOING
                       items:
                         - productName: Mechanical Keyboard
@@ -79,9 +77,6 @@ components:
           type: string
           format: date
           example: '2026-03-01'
-        deliveryStatus:
-          type: string
-          example: APPROVED
         paymentStatus:
           type: string
           enum:
