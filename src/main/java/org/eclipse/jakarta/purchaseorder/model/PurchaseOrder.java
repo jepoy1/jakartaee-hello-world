@@ -41,8 +41,8 @@ public class PurchaseOrder implements Serializable {
     @Column(name = "order_date", nullable = false)
     private LocalDate orderDate;
 
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Column(name = "delivery_status", nullable = false)
+    private String deliveryStatus;
 
     @Transient
     private String paymentStatus;

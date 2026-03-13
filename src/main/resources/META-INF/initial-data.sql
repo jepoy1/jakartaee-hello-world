@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS purchase_order (
 	order_number VARCHAR(50) NOT NULL UNIQUE,
 	customer_id BIGINT NOT NULL,
 	order_date DATE NOT NULL,
-	status VARCHAR(30) NOT NULL,
+	delivery_status VARCHAR(30) NOT NULL,
 	CONSTRAINT fk_po_customer
 		FOREIGN KEY (customer_id) REFERENCES customer(id)
 );
@@ -64,6 +64,15 @@ CREATE TABLE IF NOT EXISTS sales_invoice_items (
 	CONSTRAINT chk_invoice_item_unit_price CHECK (unit_price >= 0)
 );
 
+ALTER TABLE IF EXISTS purchase_order ADD COLUMN IF NOT EXISTS status VARCHAR(30);
+ALTER TABLE IF EXISTS purchase_order ADD COLUMN IF NOT EXISTS delivery_status VARCHAR(30);
+UPDATE purchase_order
+SET delivery_status = COALESCE(delivery_status, status, 'PENDING')
+WHERE delivery_status IS NULL;
+ALTER TABLE IF EXISTS purchase_order ALTER COLUMN delivery_status SET NOT NULL;
+ALTER TABLE IF EXISTS purchase_order DROP COLUMN IF EXISTS status;
+ALTER TABLE IF EXISTS purchase_order DROP COLUMN IF EXISTS payment_status;
+
 INSERT INTO customer (id, name, email)
 VALUES (1, 'Acme Trading', 'contact@acmetrading.com');
 
@@ -79,10 +88,10 @@ VALUES (2, 'USB-C Cable', 'Durable 1-meter USB-C charging and data cable.');
 INSERT INTO products (id, product_name, description)
 VALUES (3, 'Mechanical Keyboard', 'Full-size mechanical keyboard with tactile switches.');
 
-INSERT INTO purchase_order (order_number, customer_id, order_date, status)
+INSERT INTO purchase_order (order_number, customer_id, order_date, delivery_status)
 VALUES ('PO-2026-0001', 1, DATE '2026-03-01', 'APPROVED');
 
-INSERT INTO purchase_order (order_number, customer_id, order_date, status)
+INSERT INTO purchase_order (order_number, customer_id, order_date, delivery_status)
 VALUES ('PO-2026-0002', 2, DATE '2026-03-05', 'PENDING');
 
 INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_price)
