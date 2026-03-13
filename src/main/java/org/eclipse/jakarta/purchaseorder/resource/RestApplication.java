@@ -1,4 +1,4 @@
-package org.eclipse.jakarta.coffee.resource;
+package org.eclipse.jakarta.purchaseorder.resource;
 
 import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;

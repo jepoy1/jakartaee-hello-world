@@ -1,40 +1,44 @@
 openapi: 3.0.3
 info:
-  title: Jakarta EE Hello World API
+  title: Jakarta EE Purchase Order Tracking API
   version: 0.1.0
-  description: OpenAPI specification for the Jakarta EE sample application.
+  description: OpenAPI specification for EMW Purchase Order Tracking API
 servers:
-  - url: http://localhost:8080/jakartaee-hello-world
+  - url: http://localhost:8080/emw
     description: Local WildFly deployment
 paths:
-  /rest/coffees:
+  /purchase-orders:
     get:
-      operationId: listCoffees
+      operationId: listPurchaseOrders
       tags:
-        - Coffee
-      summary: Lists all coffees
-      description: Returns all coffee entries from the database.
+        - Purchase Order
+      summary: Lists all purchase orders
+      description: Returns all purchase orders from the database.
       responses:
         '200':
-          description: Coffee list response
+          description: Purchase order list response
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CoffeeDTO'
+                  $ref: '#/components/schemas/PurchaseOrderDTO'
               examples:
                 sample:
                   value:
                     - id: 1
-                      name: Coffee-A
-                      price: '2.75'
+                      orderNumber: PO-2026-0001
+                      customerName: Acme Trading
+                      orderDate: '2026-03-01'
+                      status: APPROVED
                     - id: 2
-                      name: Coffee-B
-                      price: '1.99'
+                      orderNumber: PO-2026-0002
+                      customerName: Blue River Supplies
+                      orderDate: '2026-03-05'
+                      status: PENDING
 components:
   schemas:
-    CoffeeDTO:
+    PurchaseOrderDTO:
       type: object
       properties:
         id:
@@ -42,9 +46,16 @@ components:
           format: int64
           readOnly: true
           example: 1
-        name:
+        orderNumber:
           type: string
-          example: Coffee-A
-        price:
+          example: PO-2026-0001
+        customerName:
           type: string
-          example: '2.75'
+          example: Acme Trading
+        orderDate:
+          type: string
+          format: date
+          example: '2026-03-01'
+        status:
+          type: string
+          example: APPROVED
