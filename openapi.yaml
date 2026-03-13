@@ -14,6 +14,16 @@ paths:
         - Purchase Order
       summary: Lists all purchase orders
       description: Returns all purchase orders from the database.
+      parameters:
+        - in: query
+          name: paymentStatus
+          required: false
+          description: Filters purchase orders by payment status.
+          schema:
+            type: string
+            enum:
+              - ONGOING
+              - FULLY_PAID
       responses:
         '200':
           description: Purchase order list response
@@ -31,6 +41,7 @@ paths:
                       customerName: Acme Trading
                       orderDate: '2026-03-01'
                       status: APPROVED
+                      paymentStatus: FULLY_PAID
                       items:
                         - productName: Laptop Dock
                           quantity: 2
@@ -43,6 +54,7 @@ paths:
                       customerName: Blue River Supplies
                       orderDate: '2026-03-05'
                       status: PENDING
+                      paymentStatus: ONGOING
                       items:
                         - productName: Mechanical Keyboard
                           quantity: 3
@@ -70,6 +82,12 @@ components:
         status:
           type: string
           example: APPROVED
+        paymentStatus:
+          type: string
+          enum:
+            - ONGOING
+            - FULLY_PAID
+          example: FULLY_PAID
         items:
           type: array
           items:

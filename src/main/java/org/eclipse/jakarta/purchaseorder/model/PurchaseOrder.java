@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,4 +43,7 @@ public class PurchaseOrder implements Serializable {
 
     @Column(name = "status", nullable = false)
     private String status;
+
+    @Transient
+    private String paymentStatus;
 }
