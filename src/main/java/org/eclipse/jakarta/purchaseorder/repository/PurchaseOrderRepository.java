@@ -27,7 +27,8 @@ public class PurchaseOrderRepository {
 
     public List<PurchaseOrder> findAll() {
         logger.info("Getting all purchase orders");
-        return em.createQuery("SELECT p FROM PurchaseOrder p JOIN FETCH p.customer", PurchaseOrder.class).getResultList();
+        return em.createQuery("SELECT DISTINCT p FROM PurchaseOrder p JOIN FETCH p.customer LEFT JOIN FETCH p.items LEFT JOIN FETCH p.items.product", PurchaseOrder.class)
+            .getResultList();
     }
 
     public Optional<PurchaseOrder> findById(Long id) {

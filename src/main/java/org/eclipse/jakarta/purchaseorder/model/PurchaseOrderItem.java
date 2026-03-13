@@ -1,8 +1,7 @@
 package org.eclipse.jakarta.purchaseorder.model;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.List;
+import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,34 +11,31 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "purchase_order")
+@Table(name = "purchase_order_items")
 @Getter
 @Setter
-public class PurchaseOrder implements Serializable {
+public class PurchaseOrderItem implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "order_number", nullable = false, unique = true)
-    private String orderNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchase_order_id", nullable = false)
+    private PurchaseOrder purchaseOrder;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
-    @OneToMany(mappedBy = "purchaseOrder")
-    private List<PurchaseOrderItem> items;
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
 
-    @Column(name = "order_date", nullable = false)
-    private LocalDate orderDate;
-
-    @Column(name = "status", nullable = false)
-    private String status;
+    @Column(name = "unit_price", nullable = false)
+    private BigDecimal unitPrice;
 }
