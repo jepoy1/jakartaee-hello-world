@@ -89,8 +89,9 @@ VALUES ('PO-2026-0001', 1, DATE '2026-03-01');
 INSERT INTO purchase_order (order_number, customer_id, order_date)
 VALUES ('PO-2026-0002', 2, DATE '2026-03-05');
 
+-- Add one more quantity to check that ONGOING status is working correctly.
 INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_price)
-VALUES (1, 1, 2, 125.50);
+VALUES (1, 1, 3, 125.50);
 
 INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_price)
 VALUES (1, 2, 10, 8.99);
