@@ -18,12 +18,13 @@ import org.eclipse.jakarta.purchaseorder.model.PurchaseOrder;
 public class PurchaseOrderRepository {
     private static final Logger logger = Logger.getLogger(MethodHandles.lookup().lookupClass().getName());
 
-    @Inject
-    private SqlSessionFactory sqlSessionFactory;
+    private final SqlSessionFactory sqlSessionFactory;
 
     PurchaseOrderRepository() {
+        this(null);
     }
 
+    @Inject
     PurchaseOrderRepository(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
     }
