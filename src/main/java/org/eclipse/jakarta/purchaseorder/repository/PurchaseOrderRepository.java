@@ -21,6 +21,13 @@ public class PurchaseOrderRepository {
     @Inject
     private SqlSessionFactory sqlSessionFactory;
 
+    PurchaseOrderRepository() {
+    }
+
+    PurchaseOrderRepository(SqlSessionFactory sqlSessionFactory) {
+        this.sqlSessionFactory = sqlSessionFactory;
+    }
+
     public PurchaseOrder create(PurchaseOrder purchaseOrder) {
         logger.info("Creating purchase order " + purchaseOrder.getOrderNumber());
         try (SqlSession sqlSession = sqlSessionFactory.openSession(true)) {

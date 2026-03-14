@@ -19,3 +19,8 @@ the file to a [Jakarta EE compatible runtime](https://jakarta.ee/compatibility).
 - Expected endpoint after deployment: `GET http://localhost:8080/emw/purchase-orders`.
 - Build/redeploy command: `./mvnw package` (or `mvnw.cmd package` on Windows).
 - If `mvn clean` fails with file-lock errors under `target/server`, stop WildFly first, then run clean/package again.
+
+### Repository Tests
+- Repository tests run against an in-memory H2 database configured in MySQL compatibility mode.
+- Run them with `./mvnw test` or `mvnw.cmd test` on Windows.
+- This keeps repository tests fast, but MySQL-specific SQL behavior should still be covered separately with integration tests against MySQL.
