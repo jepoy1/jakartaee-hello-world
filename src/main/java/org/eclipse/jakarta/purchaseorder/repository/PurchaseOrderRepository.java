@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.eclipse.jakarta.purchaseorder.model.Customer;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrder;
 
 @Stateless
@@ -106,6 +107,14 @@ public class PurchaseOrderRepository {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
             return Optional.ofNullable(mapper.findPurchaseOrderById(id));
+        }
+    }
+
+    public Optional<Customer> findCustomerByName(String name) {
+        logger.info("Getting customer by name " + name);
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+            return Optional.ofNullable(mapper.findCustomerByName(name));
         }
     }
 

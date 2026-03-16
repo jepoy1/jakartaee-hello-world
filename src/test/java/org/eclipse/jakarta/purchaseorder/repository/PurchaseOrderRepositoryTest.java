@@ -108,4 +108,12 @@ class PurchaseOrderRepositoryTest {
         assertEquals("FULLY_PAID", paymentStatuses.get(2L));
         assertFalse(paymentStatuses.isEmpty());
     }
+
+    @Test
+    void findCustomerByNameReturnsSeededCustomer() {
+        var customer = repository.findCustomerByName("Acme Trading").orElseThrow();
+
+        assertEquals(1L, customer.getId());
+        assertEquals("contact@acmetrading.com", customer.getEmail());
+    }
 }

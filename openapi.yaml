@@ -7,6 +7,34 @@ servers:
   - url: http://localhost:8080/emw
     description: Local WildFly deployment
 paths:
+  /purchase-order:
+    post:
+      operationId: createPurchaseOrder
+      tags:
+        - Purchase Order
+      summary: Creates a purchase order
+      description: Saves one purchase order at a time.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderDTO'
+            examples:
+              sample:
+                value:
+                  orderNumber: PO-2026-0003
+                  customerName: Acme Trading
+                  orderDate: '2026-03-10'
+      responses:
+        '201':
+          description: Purchase order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrderDTO'
+        '400':
+          description: Invalid request payload
   /purchase-orders:
     get:
       operationId: listPurchaseOrders

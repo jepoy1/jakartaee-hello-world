@@ -72,6 +72,9 @@ public interface PurchaseOrderQueryMapper {
     @Select("SELECT c.id, c.name, c.email FROM customer c WHERE c.id = #{id}")
     Customer findCustomerById(@Param("id") Long id);
 
+    @Select("SELECT c.id, c.name, c.email FROM customer c WHERE c.name = #{name}")
+    Customer findCustomerByName(@Param("name") String name);
+
     @Select({
         "SELECT poi.id, poi.purchase_order_id, poi.product_id, poi.quantity, poi.unit_price",
         "FROM purchase_order_items poi",
