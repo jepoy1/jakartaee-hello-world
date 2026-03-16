@@ -109,6 +109,22 @@ public class PurchaseOrderRepository {
         }
     }
 
+    public Optional<PurchaseOrder> findDetailById(Long id) {
+        logger.info("Getting purchase order details by id " + id);
+        PurchaseOrder purchaseOrder;
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+            purchaseOrder = mapper.findDetailedPurchaseOrderById(id);
+        }
+
+        if (purchaseOrder == null) {
+            return Optional.empty();
+        }
+
+        purchaseOrder.setPaymentStatus(findPaymentStatusByPurchaseOrderIds(List.of(id)).get(id));
+        return Optional.of(purchaseOrder);
+    }
+
     public void delete(Long id) {
         logger.info("Deleting purchase order by id " + id);
         try (SqlSession sqlSession = sqlSessionFactory.openSession(true)) {

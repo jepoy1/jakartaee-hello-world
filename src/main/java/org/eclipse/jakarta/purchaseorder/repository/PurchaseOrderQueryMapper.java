@@ -17,6 +17,7 @@ import org.eclipse.jakarta.purchaseorder.model.Customer;
 import org.eclipse.jakarta.purchaseorder.model.Product;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrder;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrderItem;
+import org.eclipse.jakarta.purchaseorder.model.SalesInvoiceItem;
 
 public interface PurchaseOrderQueryMapper {
 
@@ -47,6 +48,17 @@ public interface PurchaseOrderQueryMapper {
     @ResultMap("purchaseOrderResultMap")
     PurchaseOrder findPurchaseOrderById(@Param("id") Long id);
 
+    @Select("SELECT po.id, po.order_number, po.customer_id, po.order_date FROM purchase_order po WHERE po.id = #{id}")
+    @Results(id = "purchaseOrderDetailResultMap", value = {
+        @Result(column = "id", property = "id", id = true),
+        @Result(column = "order_number", property = "orderNumber"),
+        @Result(column = "order_date", property = "orderDate"),
+        @Result(column = "customer_id", property = "customer", one = @One(select = "findCustomerById")),
+        @Result(column = "id", property = "items", many = @Many(select = "findPurchaseOrderItemsByPurchaseOrderId")),
+        @Result(column = "id", property = "salesInvoiceItems", many = @Many(select = "findSalesInvoiceItemsByPurchaseOrderId"))
+    })
+    PurchaseOrder findDetailedPurchaseOrderById(@Param("id") Long id);
+
     @Insert("INSERT INTO purchase_order (order_number, customer_id, order_date) VALUES (#{orderNumber}, #{customer.id}, #{orderDate})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insertPurchaseOrder(PurchaseOrder purchaseOrder);
@@ -76,6 +88,21 @@ public interface PurchaseOrderQueryMapper {
 
     @Select("SELECT p.id, p.product_name, p.description FROM products p WHERE p.id = #{id}")
     Product findProductById(@Param("id") Long id);
+
+    @Select({
+        "SELECT sii.id, sii.sales_invoice_id, sii.product_id, sii.quantity, sii.unit_price",
+        "FROM sales_invoice_items sii",
+        "JOIN sales_invoice si ON si.id = sii.sales_invoice_id",
+        "WHERE si.purchase_order_id = #{purchaseOrderId}",
+        "ORDER BY sii.id"
+    })
+    @Results(id = "salesInvoiceItemResultMap", value = {
+        @Result(column = "id", property = "id", id = true),
+        @Result(column = "quantity", property = "quantity"),
+        @Result(column = "unit_price", property = "unitPrice"),
+        @Result(column = "product_id", property = "product", one = @One(select = "findProductById"))
+    })
+    List<SalesInvoiceItem> findSalesInvoiceItemsByPurchaseOrderId(@Param("purchaseOrderId") Long purchaseOrderId);
 
     @Select({
         "<script>",

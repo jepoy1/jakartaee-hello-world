@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.eclipse.jakarta.generated.api.PurchaseOrdersApi;
+import org.eclipse.jakarta.generated.model.PurchaseOrderDetailDTO;
 import org.eclipse.jakarta.generated.model.PurchaseOrderDTO;
 import org.eclipse.jakarta.purchaseorder.mapper.PurchaseOrderMapper;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrder;
@@ -13,6 +14,8 @@ import org.eclipse.jakarta.purchaseorder.repository.PurchaseOrderRepository;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
@@ -64,5 +67,22 @@ public class PurchaseOrderResourceImpl implements PurchaseOrdersApi {
         }
 
         return purchaseOrderDtos;
+    }
+
+    @GET
+    @Path("/{id}")
+    @Override
+    public PurchaseOrderDetailDTO getPurchaseOrderById(@PathParam("id") Long id) {
+        PurchaseOrder purchaseOrder = purchaseOrderRepository.findDetailById(id)
+            .orElseThrow(() -> new NotFoundException("Purchase order not found for id " + id));
+
+        PurchaseOrderDetailDTO purchaseOrderDetailDto = purchaseOrderMapper.toDetailDto(purchaseOrder);
+        if (purchaseOrder.getPaymentStatus() != null) {
+            purchaseOrderDetailDto.setPaymentStatus(
+                PurchaseOrderDetailDTO.PaymentStatusEnum.fromValue(purchaseOrder.getPaymentStatus())
+            );
+        }
+
+        return purchaseOrderDetailDto;
     }
 }

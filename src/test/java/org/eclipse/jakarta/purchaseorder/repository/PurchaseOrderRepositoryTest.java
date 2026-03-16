@@ -52,6 +52,22 @@ class PurchaseOrderRepositoryTest {
     }
 
     @Test
+    void findDetailByIdReturnsPurchaseAndSalesInvoiceItems() {
+        PurchaseOrder purchaseOrder = repository.findDetailById(1L).orElseThrow();
+
+        assertEquals("PO-2026-0001", purchaseOrder.getOrderNumber());
+        assertEquals("ONGOING", purchaseOrder.getPaymentStatus());
+        assertEquals(2, purchaseOrder.getItems().size());
+        assertEquals(2, purchaseOrder.getSalesInvoiceItems().size());
+        assertEquals("Laptop Dock", purchaseOrder.getSalesInvoiceItems().getFirst().getProduct().getProductName());
+    }
+
+    @Test
+    void findDetailByIdReturnsEmptyForUnknownId() {
+        assertTrue(repository.findDetailById(9999L).isEmpty());
+    }
+
+    @Test
     void createUpdateAndDeletePersistChangesInH2() {
         PurchaseOrder purchaseOrder = new PurchaseOrder();
         purchaseOrder.setOrderNumber("PO-2026-TEST");

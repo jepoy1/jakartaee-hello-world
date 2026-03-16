@@ -43,4 +43,7 @@ public class PurchaseOrder implements Serializable {
 
     @Transient
     private String paymentStatus;
+
+    @Transient
+    private List<SalesInvoiceItem> salesInvoiceItems;
 }
