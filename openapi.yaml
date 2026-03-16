@@ -41,22 +41,11 @@ paths:
                       customerName: Acme Trading
                       orderDate: '2026-03-01'
                       paymentStatus: FULLY_PAID
-                      items:
-                        - productName: Laptop Dock
-                          quantity: 2
-                          unitPrice: 125.50
-                        - productName: USB-C Cable
-                          quantity: 10
-                          unitPrice: 8.99
                     - id: 2
                       orderNumber: PO-2026-0002
                       customerName: Blue River Supplies
                       orderDate: '2026-03-05'
                       paymentStatus: ONGOING
-                      items:
-                        - productName: Mechanical Keyboard
-                          quantity: 3
-                          unitPrice: 75.00
 components:
   schemas:
     PurchaseOrderDTO:
@@ -83,26 +72,3 @@ components:
             - ONGOING
             - FULLY_PAID
           example: FULLY_PAID
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/PurchaseOrderItemDTO'
-    PurchaseOrderItemDTO:
-      type: object
-      properties:
-        productId:
-          type: integer
-          format: int64
-          readOnly: true
-          example: 1
-        productName:
-          type: string
-          example: Laptop Dock
-        quantity:
-          type: integer
-          format: int32
-          example: 2
-        unitPrice:
-          type: number
-          format: double
-          example: 125.50
