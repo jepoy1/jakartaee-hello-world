@@ -35,12 +35,23 @@ public class PurchaseOrderResourceImpl implements PurchaseOrdersApi {
 
     @GET
     @Override
-    public List<PurchaseOrderDTO> listPurchaseOrders(@QueryParam("paymentStatus") String paymentStatus) {
+    public List<PurchaseOrderDTO> listPurchaseOrders(
+        @QueryParam("paymentStatus") String paymentStatus,
+        @QueryParam("customer") String customer
+    ) {
         String normalizedPaymentStatus = paymentStatus;
         if (normalizedPaymentStatus != null) {
             normalizedPaymentStatus = normalizedPaymentStatus.trim().toUpperCase(Locale.ROOT);
             if (normalizedPaymentStatus.isBlank()) {
                 normalizedPaymentStatus = null;
+            }
+        }
+
+        String normalizedCustomer = customer;
+        if (normalizedCustomer != null) {
+            normalizedCustomer = normalizedCustomer.trim();
+            if (normalizedCustomer.isBlank()) {
+                normalizedCustomer = null;
             }
         }
 
@@ -50,7 +61,7 @@ public class PurchaseOrderResourceImpl implements PurchaseOrdersApi {
             throw new BadRequestException("paymentStatus must be ONGOING or FULLY_PAID");
         }
 
-        List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll(normalizedPaymentStatus);
+        List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findAll(normalizedPaymentStatus, normalizedCustomer);
         List<PurchaseOrderDTO> purchaseOrderDtos = purchaseOrderMapper.toDtoList(purchaseOrders);
 
         var purchaseOrderIds = purchaseOrders.stream()

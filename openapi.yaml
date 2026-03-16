@@ -52,6 +52,12 @@ paths:
             enum:
               - ONGOING
               - FULLY_PAID
+        - in: query
+          name: customer
+          required: false
+          description: Filters purchase orders by customer name.
+          schema:
+            type: string
       responses:
         '200':
           description: Purchase order list response

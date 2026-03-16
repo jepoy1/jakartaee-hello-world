@@ -132,6 +132,15 @@ public interface PurchaseOrderQueryMapper {
     List<Long> findPurchaseOrderIdsByPaymentStatus(@Param("paymentStatus") String paymentStatus);
 
     @Select({
+        "SELECT po.id",
+        "FROM purchase_order po",
+        "JOIN customer c ON c.id = po.customer_id",
+        "WHERE UPPER(c.name) LIKE CONCAT('%', UPPER(#{customer}), '%')",
+        "ORDER BY po.id"
+    })
+    List<Long> findPurchaseOrderIdsByCustomer(@Param("customer") String customer);
+
+    @Select({
         "<script>",
         "SELECT po.id AS purchase_order_id,",
         "CASE WHEN (",

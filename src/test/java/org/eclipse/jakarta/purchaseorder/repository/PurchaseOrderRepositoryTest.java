@@ -52,6 +52,28 @@ class PurchaseOrderRepositoryTest {
     }
 
     @Test
+    void findAllWithCustomerUsesSeedDataCorrectly() {
+        List<PurchaseOrder> acmeOrders = repository.findAll(null, "Acme");
+        List<PurchaseOrder> blueRiverOrders = repository.findAll(null, "Blue River");
+
+        assertEquals(1, acmeOrders.size());
+        assertEquals("PO-2026-0001", acmeOrders.getFirst().getOrderNumber());
+
+        assertEquals(1, blueRiverOrders.size());
+        assertEquals("PO-2026-0002", blueRiverOrders.getFirst().getOrderNumber());
+    }
+
+    @Test
+    void findAllWithPaymentStatusAndCustomerUsesCombinedFilters() {
+        List<PurchaseOrder> ongoingAcmeOrders = repository.findAll("ONGOING", "Acme");
+        List<PurchaseOrder> fullyPaidAcmeOrders = repository.findAll("FULLY_PAID", "Acme");
+
+        assertEquals(1, ongoingAcmeOrders.size());
+        assertEquals("PO-2026-0001", ongoingAcmeOrders.getFirst().getOrderNumber());
+        assertTrue(fullyPaidAcmeOrders.isEmpty());
+    }
+
+    @Test
     void findDetailByIdReturnsPurchaseAndSalesInvoiceItems() {
         PurchaseOrder purchaseOrder = repository.findDetailById(1L).orElseThrow();
 

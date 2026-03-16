@@ -5,6 +5,7 @@ import jakarta.inject.Inject;
 
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -53,16 +54,44 @@ public class PurchaseOrderRepository {
     }
 
     public List<PurchaseOrder> findAll(String paymentStatus) {
-        logger.info("Getting all purchase orders with paymentStatus filter: " + paymentStatus);
+        return findAll(paymentStatus, null);
+    }
 
-        if (paymentStatus == null || paymentStatus.isBlank()) {
+    public List<PurchaseOrder> findAll(String paymentStatus, String customer) {
+        logger.info("Getting all purchase orders with paymentStatus filter: " + paymentStatus
+            + " and customer filter: " + customer);
+
+        boolean hasPaymentStatusFilter = paymentStatus != null && !paymentStatus.isBlank();
+        boolean hasCustomerFilter = customer != null && !customer.isBlank();
+
+        if (!hasPaymentStatusFilter && !hasCustomerFilter) {
             return findAll();
         }
 
         List<Long> purchaseOrderIds;
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
-            purchaseOrderIds = mapper.findPurchaseOrderIdsByPaymentStatus(paymentStatus);
+
+            if (hasPaymentStatusFilter && hasCustomerFilter) {
+                List<Long> paymentStatusFilteredIds = mapper.findPurchaseOrderIdsByPaymentStatus(paymentStatus);
+                if (paymentStatusFilteredIds.isEmpty()) {
+                    return List.of();
+                }
+
+                List<Long> customerFilteredIds = mapper.findPurchaseOrderIdsByCustomer(customer);
+                if (customerFilteredIds.isEmpty()) {
+                    return List.of();
+                }
+
+                var customerFilteredIdSet = new HashSet<>(customerFilteredIds);
+                purchaseOrderIds = paymentStatusFilteredIds.stream()
+                    .filter(customerFilteredIdSet::contains)
+                    .toList();
+            } else if (hasPaymentStatusFilter) {
+                purchaseOrderIds = mapper.findPurchaseOrderIdsByPaymentStatus(paymentStatus);
+            } else {
+                purchaseOrderIds = mapper.findPurchaseOrderIdsByCustomer(customer);
+            }
         }
 
         if (purchaseOrderIds.isEmpty()) {
