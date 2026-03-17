@@ -35,6 +35,7 @@
               <th>Quantity</th>
               <th>Unit Price</th>
               <th>Subtotal</th>
+              <th>Not Yet Paid Qty</th>
             </tr>
           </thead>
           <tbody id="purchaseItemsBody"></tbody>
@@ -46,6 +47,7 @@
         <table id="salesInvoiceItemsTable">
           <thead>
             <tr>
+              <th>Invoice Number</th>
               <th>Product</th>
               <th>Quantity</th>
               <th>Unit Price</th>
@@ -66,19 +68,39 @@
       statusEl.textContent = message;
     }
 
-    function renderPurchaseItems(items) {
+    function getItemKey(item) {
+      if (item?.productId != null) {
+        return `id:${item.productId}`;
+      }
+
+      if (typeof item?.productName === 'string' && item.productName.trim().length > 0) {
+        return `name:${item.productName.trim().toLowerCase()}`;
+      }
+
+      return 'unknown';
+    }
+
+    function renderPurchaseItems(items, salesInvoiceItems) {
       const tbody = document.getElementById('purchaseItemsBody');
       tbody.replaceChildren();
 
       if (!items || !items.length) {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
-        cell.colSpan = 4;
+        cell.colSpan = 5;
         cell.textContent = 'No purchase items.';
         row.appendChild(cell);
         tbody.appendChild(row);
         return;
       }
+
+      const invoicedQuantityByItemKey = new Map();
+      (Array.isArray(salesInvoiceItems) ? salesInvoiceItems : []).forEach((salesItem) => {
+        const key = getItemKey(salesItem);
+        const qty = Number(salesItem?.quantity ?? 0);
+        const current = invoicedQuantityByItemKey.get(key) ?? 0;
+        invoicedQuantityByItemKey.set(key, current + (Number.isFinite(qty) ? qty : 0));
+      });
 
       items.forEach((item) => {
         const row = document.createElement('tr');
@@ -100,6 +122,13 @@
         subtotalCell.textContent = subtotal.toFixed(2);
         row.appendChild(subtotalCell);
 
+        const notYetPaidQtyCell = document.createElement('td');
+        const purchaseQty = Number(item?.quantity ?? 0);
+        const invoicedQty = invoicedQuantityByItemKey.get(getItemKey(item)) ?? 0;
+        const notYetPaidQty = purchaseQty - invoicedQty;
+        notYetPaidQtyCell.textContent = Number.isFinite(notYetPaidQty) ? String(notYetPaidQty) : '';
+        row.appendChild(notYetPaidQtyCell);
+
         tbody.appendChild(row);
       });
     }
@@ -111,7 +140,7 @@
       if (!items || !items.length) {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
-        cell.colSpan = 4;
+        cell.colSpan = 5;
         cell.textContent = 'No sales invoice items.';
         row.appendChild(cell);
         tbody.appendChild(row);
@@ -120,6 +149,10 @@
 
       items.forEach((item) => {
         const row = document.createElement('tr');
+
+        const invoiceNumberCell = document.createElement('td');
+        invoiceNumberCell.textContent = item.invoiceNumber ?? '';
+        row.appendChild(invoiceNumberCell);
 
         const productCell = document.createElement('td');
         productCell.textContent = item.productName ?? '';
@@ -172,7 +205,7 @@
           detailStatusEl.textContent = '';
         }
 
-        renderPurchaseItems(order.purchaseItems);
+        renderPurchaseItems(order.purchaseItems, order.salesInvoiceItems);
         renderSalesInvoiceItems(order.salesInvoiceItems);
 
         orderDetail.hidden = false;

@@ -132,7 +132,7 @@ public interface PurchaseOrderQueryMapper {
     );
 
     @Select({
-        "SELECT sii.id, sii.sales_invoice_id, sii.product_id, sii.quantity, sii.unit_price",
+        "SELECT sii.id, si.invoice_number, sii.sales_invoice_id, sii.product_id, sii.quantity, sii.unit_price",
         "FROM sales_invoice_items sii",
         "JOIN sales_invoice si ON si.id = sii.sales_invoice_id",
         "WHERE si.purchase_order_id = #{purchaseOrderId}",
@@ -140,6 +140,7 @@ public interface PurchaseOrderQueryMapper {
     })
     @Results(id = "salesInvoiceItemResultMap", value = {
         @Result(column = "id", property = "id", id = true),
+        @Result(column = "invoice_number", property = "invoiceNumber"),
         @Result(column = "quantity", property = "quantity"),
         @Result(column = "unit_price", property = "unitPrice"),
         @Result(column = "product_id", property = "product", one = @One(select = "findProductById"))

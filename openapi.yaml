@@ -246,6 +246,9 @@ components:
     SalesInvoiceItemDTO:
       type: object
       properties:
+        invoiceNumber:
+          type: string
+          example: SI-2026-0003
         productId:
           type: integer
           format: int64
