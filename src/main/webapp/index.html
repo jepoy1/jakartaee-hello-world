@@ -18,7 +18,14 @@
       </select>
 
       <label for="customer">Customer</label>
-      <input id="customer" name="customer" type="text" placeholder="Customer name">
+      <select id="customer" name="customer">
+        <option value="">All</option>
+        <option value="Centro Manufacturing">Centro Manufacturing</option>
+        <option value="Hino Motors Philippines">Hino Motors Philippines</option>
+        <option value="Kyoei Kogyo">Kyoei Kogyo</option>
+        <option value="Mitsubishi Motors Philippines">Mitsubishi Motors Philippines</option>
+        <option value="Del Monte Motors">Del Monte Motors</option>
+      </select>
 
       <button type="submit">Search</button>
       <button type="button" id="clearFilters">Clear</button>
@@ -116,7 +123,7 @@
     async function loadPurchaseOrders() {
       const params = buildQueryParams();
       const queryString = params.toString();
-      const requestUrl = queryString ? `purchase-orders?${queryString}` : 'purchase-orders';
+      const requestUrl = queryString ? `/emw/purchase-orders?${queryString}` : '/emw/purchase-orders';
 
       setStatus('Loading purchase orders...');
 
