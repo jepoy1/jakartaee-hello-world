@@ -46,6 +46,13 @@ public class UiResource {
         return pageResponse("/create-sales-invoice.html", "Create sales invoice page not found");
     }
 
+    @GET
+    @Path("view-purchase-order.html")
+    @Produces(MediaType.TEXT_HTML)
+    public Response getViewPurchaseOrderPage() {
+        return pageResponse("/view-purchase-order.html", "View purchase order page not found");
+    }
+
     private Response indexResponse() {
         return pageResponse("/index.html", "UI page not found");
     }

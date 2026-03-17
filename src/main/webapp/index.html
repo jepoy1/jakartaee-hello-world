@@ -42,6 +42,7 @@
           <th>Customer</th>
           <th>Order Date</th>
           <th>Payment Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="resultsBody"></tbody>
@@ -66,7 +67,7 @@
       if (!orders.length) {
         const emptyRow = document.createElement('tr');
         const emptyCell = document.createElement('td');
-        emptyCell.colSpan = 5;
+        emptyCell.colSpan = 6;
         emptyCell.textContent = 'No purchase orders found.';
         emptyRow.appendChild(emptyCell);
         resultsBody.appendChild(emptyRow);
@@ -95,6 +96,13 @@
         const paymentStatusCell = document.createElement('td');
         paymentStatusCell.textContent = order.paymentStatus ?? '';
         row.appendChild(paymentStatusCell);
+
+        const actionsCell = document.createElement('td');
+        const viewLink = document.createElement('a');
+        viewLink.href = `/emw/view-purchase-order.html?id=${order.id}`;
+        viewLink.textContent = 'View';
+        actionsCell.appendChild(viewLink);
+        row.appendChild(actionsCell);
 
         resultsBody.appendChild(row);
       });

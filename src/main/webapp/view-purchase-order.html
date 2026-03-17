@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Order Detail</title>
+</head>
+<body>
+  <main>
+    <h1>Purchase Order Detail</h1>
+    <p><a href="/emw/">Back to Purchase Orders</a></p>
+
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <section id="orderDetail" hidden>
+      <table>
+        <tbody>
+          <tr><th>ID</th><td id="detailId"></td></tr>
+          <tr><th>Order Number</th><td id="detailOrderNumber"></td></tr>
+          <tr><th>Customer</th><td id="detailCustomer"></td></tr>
+          <tr><th>Order Date</th><td id="detailOrderDate"></td></tr>
+          <tr><th>Payment Status</th><td id="detailPaymentStatus"></td></tr>
+        </tbody>
+      </table>
+
+      <h2>Purchase Items</h2>
+      <table id="purchaseItemsTable">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody id="purchaseItemsBody"></tbody>
+      </table>
+
+      <h2>Sales Invoice Items</h2>
+      <table id="salesInvoiceItemsTable">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody id="salesInvoiceItemsBody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const orderDetail = document.getElementById('orderDetail');
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    function renderPurchaseItems(items) {
+      const tbody = document.getElementById('purchaseItemsBody');
+      tbody.replaceChildren();
+
+      if (!items || !items.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 4;
+        cell.textContent = 'No purchase items.';
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+      }
+
+      items.forEach((item) => {
+        const row = document.createElement('tr');
+
+        const productCell = document.createElement('td');
+        productCell.textContent = item.productName ?? '';
+        row.appendChild(productCell);
+
+        const qtyCell = document.createElement('td');
+        qtyCell.textContent = item.quantity ?? '';
+        row.appendChild(qtyCell);
+
+        const priceCell = document.createElement('td');
+        priceCell.textContent = item.unitPrice != null ? item.unitPrice.toFixed(2) : '';
+        row.appendChild(priceCell);
+
+        const subtotalCell = document.createElement('td');
+        const subtotal = (item.quantity ?? 0) * (item.unitPrice ?? 0);
+        subtotalCell.textContent = subtotal.toFixed(2);
+        row.appendChild(subtotalCell);
+
+        tbody.appendChild(row);
+      });
+    }
+
+    function renderSalesInvoiceItems(items) {
+      const tbody = document.getElementById('salesInvoiceItemsBody');
+      tbody.replaceChildren();
+
+      if (!items || !items.length) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 4;
+        cell.textContent = 'No sales invoice items.';
+        row.appendChild(cell);
+        tbody.appendChild(row);
+        return;
+      }
+
+      items.forEach((item) => {
+        const row = document.createElement('tr');
+
+        const productCell = document.createElement('td');
+        productCell.textContent = item.productName ?? '';
+        row.appendChild(productCell);
+
+        const qtyCell = document.createElement('td');
+        qtyCell.textContent = item.quantity ?? '';
+        row.appendChild(qtyCell);
+
+        const priceCell = document.createElement('td');
+        priceCell.textContent = item.unitPrice != null ? item.unitPrice.toFixed(2) : '';
+        row.appendChild(priceCell);
+
+        const subtotalCell = document.createElement('td');
+        const subtotal = (item.quantity ?? 0) * (item.unitPrice ?? 0);
+        subtotalCell.textContent = subtotal.toFixed(2);
+        row.appendChild(subtotalCell);
+
+        tbody.appendChild(row);
+      });
+    }
+
+    async function loadOrderDetail(id) {
+      setStatus('Loading purchase order...');
+
+      try {
+        const response = await fetch(`/emw/purchase-orders/${encodeURIComponent(id)}`, {
+          headers: { Accept: 'application/json' }
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || `Request failed with status ${response.status}`);
+        }
+
+        const order = await response.json();
+
+        document.getElementById('detailId').textContent = order.id ?? '';
+        document.getElementById('detailOrderNumber').textContent = order.orderNumber ?? '';
+        document.getElementById('detailCustomer').textContent = order.customerName ?? '';
+        document.getElementById('detailOrderDate').textContent = order.orderDate ?? '';
+        document.getElementById('detailPaymentStatus').textContent = order.paymentStatus ?? '';
+
+        renderPurchaseItems(order.purchaseItems);
+        renderSalesInvoiceItems(order.salesInvoiceItems);
+
+        orderDetail.hidden = false;
+        setStatus('');
+      } catch (error) {
+        setStatus(`Failed to load purchase order: ${error.message}`);
+      }
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    if (!id) {
+      setStatus('No purchase order ID provided.');
+    } else {
+      loadOrderDetail(id);
+    }
+  </script>
+</body>
+</html>
