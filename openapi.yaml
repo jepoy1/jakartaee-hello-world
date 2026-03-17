@@ -147,8 +147,9 @@ paths:
               sample:
                 value:
                   invoiceNumber: SI-2026-0003
-                  purchaseOrderId: 1
+                  purchaseOrderNumber: PO-2026-0001
                   customerName: Centro Manufacturing
+                  purchaseOrderDate: '2026-03-01'
                   invoiceDate: '2026-03-15'
                   salesInvoiceItems:
                     - productName: Stainless Hinge with Handle
@@ -276,6 +277,9 @@ components:
         invoiceNumber:
           type: string
           example: SI-2026-0003
+        purchaseOrderNumber:
+          type: string
+          example: PO-2026-0001
         purchaseOrderId:
           type: integer
           format: int64
@@ -283,6 +287,10 @@ components:
         customerName:
           type: string
           example: Centro Manufacturing
+        purchaseOrderDate:
+          type: string
+          format: date
+          example: '2026-03-01'
         invoiceDate:
           type: string
           format: date

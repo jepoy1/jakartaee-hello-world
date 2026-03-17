@@ -19,14 +19,18 @@
             <input id="invoiceNumber" name="invoiceNumber" type="text" required placeholder="SI-2026-0003">
           </div>
           <div class="form-field">
-            <label for="purchaseOrderId">Purchase Order ID</label>
-            <input id="purchaseOrderId" name="purchaseOrderId" type="number" min="1" required placeholder="1">
+            <label for="purchaseOrderNumber">Purchase Order Number</label>
+            <input id="purchaseOrderNumber" name="purchaseOrderNumber" type="text" required placeholder="PO-2026-0001">
           </div>
           <div class="form-field">
             <label for="customerName">Customer</label>
             <select id="customerName" name="customerName" required>
               <option value="">Select customer</option>
             </select>
+          </div>
+          <div class="form-field">
+            <label for="purchaseOrderDate">Purchase Order Date</label>
+            <input id="purchaseOrderDate" name="purchaseOrderDate" type="date" required>
           </div>
           <div class="form-field">
             <label for="invoiceDate">Invoice Date</label>
@@ -109,8 +113,9 @@
 
       const payload = {
         invoiceNumber: form.invoiceNumber.value.trim(),
-        purchaseOrderId: Number(form.purchaseOrderId.value),
+        purchaseOrderNumber: form.purchaseOrderNumber.value.trim(),
         customerName: form.customerName.value,
+        purchaseOrderDate: form.purchaseOrderDate.value,
         invoiceDate: form.invoiceDate.value,
         salesInvoiceItems: [
           {

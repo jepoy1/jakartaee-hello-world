@@ -152,8 +152,9 @@ class PurchaseOrderRepositoryTest {
 
         var createdSalesInvoice = repository.createSalesInvoice(
             "SI-2026-TEST",
-            1L,
+            "PO-2026-0001",
             "Centro Manufacturing",
+            LocalDate.of(2026, 3, 1),
             LocalDate.of(2026, 3, 16),
             List.of(salesInvoiceItem)
         );
@@ -178,13 +179,17 @@ class PurchaseOrderRepositoryTest {
             IllegalArgumentException.class,
             () -> repository.createSalesInvoice(
                 "SI-2026-INVALID",
-                1L,
+                "PO-2026-0001",
                 "Hino Motors Philippines",
+                LocalDate.of(2026, 3, 1),
                 LocalDate.of(2026, 3, 16),
                 List.of(salesInvoiceItem)
             )
         );
 
-        assertEquals("customerName does not match purchaseOrderId: 1", exception.getMessage());
+        assertEquals(
+            "No purchase order found for purchaseOrderNumber/customerName/purchaseOrderDate combination",
+            exception.getMessage()
+        );
     }
 }

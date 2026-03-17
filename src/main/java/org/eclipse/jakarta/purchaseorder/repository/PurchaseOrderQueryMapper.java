@@ -49,6 +49,22 @@ public interface PurchaseOrderQueryMapper {
     @ResultMap("purchaseOrderResultMap")
     PurchaseOrder findPurchaseOrderById(@Param("id") Long id);
 
+    @Select({
+        "SELECT po.id, po.order_number, po.customer_id, po.order_date",
+        "FROM purchase_order po",
+        "JOIN customer c ON c.id = po.customer_id",
+        "WHERE po.order_number = #{orderNumber}",
+        "AND c.name = #{customerName}",
+        "AND po.order_date = #{orderDate}",
+        "LIMIT 1"
+    })
+    @ResultMap("purchaseOrderResultMap")
+    PurchaseOrder findPurchaseOrderByOrderNumberCustomerNameAndOrderDate(
+        @Param("orderNumber") String orderNumber,
+        @Param("customerName") String customerName,
+        @Param("orderDate") java.time.LocalDate orderDate
+    );
+
     @Select("SELECT po.id, po.order_number, po.customer_id, po.order_date FROM purchase_order po WHERE po.id = #{id}")
     @Results(id = "purchaseOrderDetailResultMap", value = {
         @Result(column = "id", property = "id", id = true),

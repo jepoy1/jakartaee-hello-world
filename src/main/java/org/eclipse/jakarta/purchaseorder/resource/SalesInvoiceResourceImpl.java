@@ -34,6 +34,7 @@ public class SalesInvoiceResourceImpl implements SalesInvoiceApi {
         validateCreateRequest(salesInvoiceDto);
 
         String normalizedInvoiceNumber = salesInvoiceDto.getInvoiceNumber().trim();
+        String normalizedPurchaseOrderNumber = salesInvoiceDto.getPurchaseOrderNumber().trim();
         String normalizedCustomerName = salesInvoiceDto.getCustomerName().trim();
 
         List<SalesInvoiceItem> salesInvoiceItems = salesInvoiceDto.getSalesInvoiceItems().stream()
@@ -44,8 +45,9 @@ public class SalesInvoiceResourceImpl implements SalesInvoiceApi {
         try {
             createdSalesInvoice = purchaseOrderRepository.createSalesInvoice(
                 normalizedInvoiceNumber,
-                salesInvoiceDto.getPurchaseOrderId(),
+                normalizedPurchaseOrderNumber,
                 normalizedCustomerName,
+                salesInvoiceDto.getPurchaseOrderDate(),
                 salesInvoiceDto.getInvoiceDate(),
                 salesInvoiceItems
             );
@@ -56,8 +58,10 @@ public class SalesInvoiceResourceImpl implements SalesInvoiceApi {
         SalesInvoiceDTO createdSalesInvoiceDto = new SalesInvoiceDTO();
         createdSalesInvoiceDto.setId(createdSalesInvoice.getId());
         createdSalesInvoiceDto.setInvoiceNumber(normalizedInvoiceNumber);
-        createdSalesInvoiceDto.setPurchaseOrderId(salesInvoiceDto.getPurchaseOrderId());
+        createdSalesInvoiceDto.setPurchaseOrderId(createdSalesInvoice.getPurchaseOrderId());
+        createdSalesInvoiceDto.setPurchaseOrderNumber(normalizedPurchaseOrderNumber);
         createdSalesInvoiceDto.setCustomerName(normalizedCustomerName);
+        createdSalesInvoiceDto.setPurchaseOrderDate(salesInvoiceDto.getPurchaseOrderDate());
         createdSalesInvoiceDto.setInvoiceDate(salesInvoiceDto.getInvoiceDate());
         createdSalesInvoiceDto.setSalesInvoiceItems(salesInvoiceDto.getSalesInvoiceItems());
 
@@ -84,12 +88,16 @@ public class SalesInvoiceResourceImpl implements SalesInvoiceApi {
             throw new BadRequestException("invoiceNumber is required");
         }
 
-        if (salesInvoiceDto.getPurchaseOrderId() == null) {
-            throw new BadRequestException("purchaseOrderId is required");
+        if (isBlank(salesInvoiceDto.getPurchaseOrderNumber())) {
+            throw new BadRequestException("purchaseOrderNumber is required");
         }
 
         if (isBlank(salesInvoiceDto.getCustomerName())) {
             throw new BadRequestException("customerName is required");
+        }
+
+        if (salesInvoiceDto.getPurchaseOrderDate() == null) {
+            throw new BadRequestException("purchaseOrderDate is required");
         }
 
         if (salesInvoiceDto.getInvoiceDate() == null) {

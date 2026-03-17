@@ -199,19 +199,26 @@ public class PurchaseOrderRepository {
 
     public SalesInvoice createSalesInvoice(
         String invoiceNumber,
-        Long purchaseOrderId,
+        String purchaseOrderNumber,
         String customerName,
+        java.time.LocalDate purchaseOrderDate,
         java.time.LocalDate invoiceDate,
         List<SalesInvoiceItem> salesInvoiceItems
     ) {
-        logger.info("Creating sales invoice " + invoiceNumber + " for purchaseOrderId " + purchaseOrderId);
+        logger.info("Creating sales invoice " + invoiceNumber + " for purchaseOrderNumber " + purchaseOrderNumber);
 
         try (SqlSession sqlSession = sqlSessionFactory.openSession(false)) {
             PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
 
-            PurchaseOrder purchaseOrder = mapper.findPurchaseOrderById(purchaseOrderId);
+            PurchaseOrder purchaseOrder = mapper.findPurchaseOrderByOrderNumberCustomerNameAndOrderDate(
+                purchaseOrderNumber,
+                customerName,
+                purchaseOrderDate
+            );
             if (purchaseOrder == null) {
-                throw new IllegalArgumentException("Unknown purchaseOrderId: " + purchaseOrderId);
+                throw new IllegalArgumentException(
+                    "No purchase order found for purchaseOrderNumber/customerName/purchaseOrderDate combination"
+                );
             }
 
             Customer customer = mapper.findCustomerByName(customerName);
@@ -221,7 +228,7 @@ public class PurchaseOrderRepository {
 
             if (!customer.getId().equals(purchaseOrder.getCustomer().getId())) {
                 throw new IllegalArgumentException(
-                    "customerName does not match purchaseOrderId: " + purchaseOrderId
+                    "customerName does not match purchaseOrderNumber: " + purchaseOrderNumber
                 );
             }
 
@@ -231,7 +238,7 @@ public class PurchaseOrderRepository {
 
             SalesInvoice salesInvoice = new SalesInvoice();
             salesInvoice.setInvoiceNumber(invoiceNumber);
-            salesInvoice.setPurchaseOrderId(purchaseOrderId);
+            salesInvoice.setPurchaseOrderId(purchaseOrder.getId());
             salesInvoice.setCustomerId(customer.getId());
             salesInvoice.setInvoiceDate(invoiceDate);
             salesInvoice.setTotalAmount(totalAmount);

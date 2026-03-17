@@ -35,8 +35,9 @@ class SalesInvoiceResourceApiTest {
 
         SalesInvoiceDTO request = new SalesInvoiceDTO();
         request.setInvoiceNumber("SI-2026-API-001");
-        request.setPurchaseOrderId(1L);
+        request.setPurchaseOrderNumber("PO-2026-0001");
         request.setCustomerName("Centro Manufacturing");
+        request.setPurchaseOrderDate(LocalDate.of(2026, 3, 1));
         request.setInvoiceDate(LocalDate.of(2026, 3, 17));
         request.setSalesInvoiceItems(List.of(item));
 
@@ -44,6 +45,7 @@ class SalesInvoiceResourceApiTest {
 
         assertNotNull(response.getId());
         assertEquals("SI-2026-API-001", response.getInvoiceNumber());
+        assertEquals("PO-2026-0001", response.getPurchaseOrderNumber());
         assertEquals(1L, response.getPurchaseOrderId());
         assertEquals("Centro Manufacturing", response.getCustomerName());
         assertEquals(1, response.getSalesInvoiceItems().size());
