@@ -68,54 +68,66 @@ ALTER TABLE IF EXISTS purchase_order DROP COLUMN IF EXISTS status;
 ALTER TABLE IF EXISTS purchase_order DROP COLUMN IF EXISTS delivery_status;
 ALTER TABLE IF EXISTS purchase_order DROP COLUMN IF EXISTS payment_status;
 
-INSERT INTO customer (id, name, email) VALUES (1, 'Centro Manufacturing', 'contact@centro.com');
-INSERT INTO customer (id, name, email) VALUES (2, 'Hino Motors Philippines', NULL);
-INSERT INTO customer (id, name, email) VALUES (3, 'Kyoei Kogyo', NULL);
-INSERT INTO customer (id, name, email) VALUES (4, 'Mitsubishi Motors Philippines', NULL);
-INSERT INTO customer (id, name, email) VALUES (5, 'Del Monte Motors', NULL);
+INSERT INTO customer (id, name, email)
+VALUES (1, 'Centro Manufacturing', 'contact@centro.com');
+INSERT INTO customer (id, name, email)
+VALUES (2, 'Hino Motors Philippines', NULL);
+INSERT INTO customer (id, name, email)
+VALUES (3, 'Kyoei Kogyo', NULL);
+INSERT INTO customer (id, name, email)
+VALUES (4, 'Mitsubishi Motors Philippines', NULL);
+INSERT INTO customer (id, name, email)
+VALUES (5, 'Del Monte Motors', NULL);
 
-INSERT INTO products (id, product_name, description) VALUES (1, 'Stainless Hinge with Handle', NULL);
-INSERT INTO products (id, product_name, description) VALUES (2, 'Stainless Hinge without Handle', NULL);
-INSERT INTO products (id, product_name, description) VALUES (3, 'Dropside Hinge (All Galvanized)', NULL);
-INSERT INTO products (id, product_name, description) VALUES (4, 'Dropside Lock Catcher Front (Dutro 302/422)', NULL);
-INSERT INTO products (id, product_name, description) VALUES (5, 'Gas Tank Cover - Medium', NULL);
-INSERT INTO products (id, product_name, description) VALUES (6, 'Stainless Seat Shoe Partition', NULL);
-INSERT INTO products (id, product_name, description) VALUES (7, 'Dropside Hinge Galvanized (FG8J) (4.5x100x145)', '(4.5x100x145)');
-INSERT INTO products (id, product_name, description) VALUES (8, 'Forged Lock T-Key', NULL);
-INSERT INTO products (id, product_name, description) VALUES (9, 'Windshield Center Post Plate', NULL);
-INSERT INTO products (id, product_name, description) VALUES (10, 'Stainless Forged Lock Cover with Oval Center', NULL);
-INSERT INTO products (id, product_name, description) VALUES (11, 'Lock, Baggage Forged LH/RH', NULL);
-INSERT INTO products (id, product_name, description) VALUES (12, 'T Battery Key', NULL);
-INSERT INTO products (id, product_name, description) VALUES (13, 'Tension Rod with NLW (16mm x 742) (Dutro WU422)', NULL);
-INSERT INTO products (id, product_name, description) VALUES (14, 'Barrel Bolt LBC', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (1, 'Stainless Hinge with Handle', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (2, 'Stainless Hinge without Handle', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (3, 'Dropside Hinge (All Galvanized)', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (4, 'Dropside Lock Catcher Front (Dutro 302/422)', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (5, 'Gas Tank Cover - Medium', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (6, 'Stainless Seat Shoe Partition', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (7, 'Dropside Hinge Galvanized (FG8J) (4.5x100x145)', '(4.5x100x145)');
+INSERT INTO products (id, product_name, description)
+VALUES (8, 'Forged Lock T-Key', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (9, 'Windshield Center Post Plate', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (10, 'Stainless Forged Lock Cover with Oval Center', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (11, 'Lock, Baggage Forged LH/RH', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (12, 'T Battery Key', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (13, 'Tension Rod with NLW (16mm x 742) (Dutro WU422)', NULL);
+INSERT INTO products (id, product_name, description)
+VALUES (14, 'Barrel Bolt LBC', NULL);
 
-INSERT INTO purchase_order (order_number, customer_id, order_date)
-VALUES ('PO-2026-0001', 1, DATE '2026-03-01');
+INSERT INTO purchase_order (id, order_number, customer_id, order_date)
+VALUES (1, 'PO-2026-0001', 1, DATE '2026-03-01');
+INSERT INTO purchase_order (id, order_number, customer_id, order_date)
+VALUES (2, 'PO-2026-0002', 2, DATE '2026-03-05');
 
-INSERT INTO purchase_order (order_number, customer_id, order_date)
-VALUES ('PO-2026-0002', 2, DATE '2026-03-05');
+INSERT INTO purchase_order_items (id, purchase_order_id, product_id, quantity, unit_price)
+VALUES (1, 1, 1, 3, 125.50);
+INSERT INTO purchase_order_items (id, purchase_order_id, product_id, quantity, unit_price)
+VALUES (2, 1, 2, 10, 8.99);
+INSERT INTO purchase_order_items (id, purchase_order_id, product_id, quantity, unit_price)
+VALUES (3, 2, 3, 3, 75.00);
 
--- Add one more quantity to check that ONGOING status is working correctly.
-INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_price)
-VALUES (1, 1, 3, 125.50);
+INSERT INTO sales_invoice (id, invoice_number, purchase_order_id, customer_id, invoice_date, total_amount)
+VALUES (1, 'SI-2026-0001', 1, 1, DATE '2026-03-03', 340.90);
+INSERT INTO sales_invoice (id, invoice_number, purchase_order_id, customer_id, invoice_date, total_amount)
+VALUES (2, 'SI-2026-0002', 2, 2, DATE '2026-03-07', 225.00);
 
-INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_price)
-VALUES (1, 2, 10, 8.99);
-
-INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_price)
-VALUES (2, 3, 3, 75.00);
-
-INSERT INTO sales_invoice (invoice_number, purchase_order_id, customer_id, invoice_date, total_amount)
-VALUES ('SI-2026-0001', 1, 1, DATE '2026-03-03', 340.90);
-
-INSERT INTO sales_invoice (invoice_number, purchase_order_id, customer_id, invoice_date, total_amount)
-VALUES ('SI-2026-0002', 2, 2, DATE '2026-03-07', 225.00);
-
-INSERT INTO sales_invoice_items (sales_invoice_id, product_id, quantity, unit_price)
-VALUES (1, 1, 2, 125.50);
-
-INSERT INTO sales_invoice_items (sales_invoice_id, product_id, quantity, unit_price)
-VALUES (1, 2, 10, 8.99);
-
-INSERT INTO sales_invoice_items (sales_invoice_id, product_id, quantity, unit_price)
-VALUES (2, 3, 3, 75.00);
+INSERT INTO sales_invoice_items (id, sales_invoice_id, product_id, quantity, unit_price)
+VALUES (1, 1, 1, 2, 125.50);
+INSERT INTO sales_invoice_items (id, sales_invoice_id, product_id, quantity, unit_price)
+VALUES (2, 1, 2, 10, 8.99);
+INSERT INTO sales_invoice_items (id, sales_invoice_id, product_id, quantity, unit_price)
+VALUES (3, 2, 3, 3, 75.00);
