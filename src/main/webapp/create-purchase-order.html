@@ -4,33 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Purchase Order</title>
+  <link rel="stylesheet" href="/emw/style.css">
 </head>
 <body>
   <main>
     <h1>Create Purchase Order</h1>
-    <p><a href="/emw/">Back to Purchase Orders</a></p>
+    <a href="/emw/" class="back-link">&#8592; Back to Purchase Orders</a>
 
-    <form id="purchaseOrderForm" aria-label="Create purchase order form">
-      <label for="orderNumber">Order Number</label>
-      <input id="orderNumber" name="orderNumber" type="text" required placeholder="PO-2026-0003">
+    <div class="card">
+      <form id="purchaseOrderForm" aria-label="Create purchase order form">
+        <div class="form-stack">
+          <div class="form-field">
+            <label for="orderNumber">Order Number</label>
+            <input id="orderNumber" name="orderNumber" type="text" required placeholder="PO-2026-0003">
+          </div>
+          <div class="form-field">
+            <label for="customerName">Customer</label>
+            <select id="customerName" name="customerName" required>
+              <option value="">Select customer</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="orderDate">Order Date</label>
+            <input id="orderDate" name="orderDate" type="date" required>
+          </div>
+        </div>
 
-      <label for="customerName">Customer</label>
-      <select id="customerName" name="customerName" required>
-        <option value="">Select customer</option>
-      </select>
+        <h2>Purchase Items</h2>
+        <div id="itemsContainer"></div>
+        <button type="button" id="addItemButton" class="btn btn-secondary btn-sm">+ Add Item</button>
 
-      <label for="orderDate">Order Date</label>
-      <input id="orderDate" name="orderDate" type="date" required>
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">Create Purchase Order</button>
+          <button type="button" id="resetButton" class="btn btn-secondary">Reset</button>
+        </div>
+      </form>
+    </div>
 
-      <h2>Purchase Items</h2>
-      <div id="itemsContainer"></div>
-      <button type="button" id="addItemButton">Add Item</button>
-
-      <button type="submit">Create Purchase Order</button>
-      <button type="button" id="resetButton">Reset</button>
-    </form>
-
-    <p id="status" role="status" aria-live="polite"></p>
+    <p id="status" class="status-msg" role="status" aria-live="polite"></p>
   </main>
 
   <script>
@@ -68,18 +79,22 @@
 
     function createItemRow(item = {}) {
       const row = document.createElement('div');
+      row.className = 'item-row';
 
+      const productField = document.createElement('div');
+      productField.className = 'form-field';
       const productLabel = document.createElement('label');
-      productLabel.textContent = 'Product Name';
-      row.appendChild(productLabel);
-
+      productLabel.textContent = 'Product';
+      productField.appendChild(productLabel);
       const productSelect = createProductSelect(item.productName ?? '');
-      row.appendChild(productSelect);
+      productField.appendChild(productSelect);
+      row.appendChild(productField);
 
+      const qtyField = document.createElement('div');
+      qtyField.className = 'form-field';
       const quantityLabel = document.createElement('label');
       quantityLabel.textContent = 'Quantity';
-      row.appendChild(quantityLabel);
-
+      qtyField.appendChild(quantityLabel);
       const quantityInput = document.createElement('input');
       quantityInput.type = 'number';
       quantityInput.className = 'item-quantity';
@@ -87,12 +102,14 @@
       quantityInput.required = true;
       quantityInput.placeholder = '1';
       quantityInput.value = item.quantity ?? '';
-      row.appendChild(quantityInput);
+      qtyField.appendChild(quantityInput);
+      row.appendChild(qtyField);
 
+      const priceField = document.createElement('div');
+      priceField.className = 'form-field';
       const unitPriceLabel = document.createElement('label');
       unitPriceLabel.textContent = 'Unit Price';
-      row.appendChild(unitPriceLabel);
-
+      priceField.appendChild(unitPriceLabel);
       const unitPriceInput = document.createElement('input');
       unitPriceInput.type = 'number';
       unitPriceInput.className = 'item-unit-price';
@@ -101,11 +118,13 @@
       unitPriceInput.required = true;
       unitPriceInput.placeholder = '125.50';
       unitPriceInput.value = item.unitPrice ?? '';
-      row.appendChild(unitPriceInput);
+      priceField.appendChild(unitPriceInput);
+      row.appendChild(priceField);
 
       const removeButton = document.createElement('button');
       removeButton.type = 'button';
-      removeButton.textContent = 'Remove Item';
+      removeButton.className = 'btn btn-danger btn-sm';
+      removeButton.textContent = 'Remove';
       removeButton.addEventListener('click', () => {
         if (itemsContainer.children.length > 1) {
           row.remove();

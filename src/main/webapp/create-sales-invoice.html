@@ -4,43 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Sales Invoice</title>
+  <link rel="stylesheet" href="/emw/style.css">
 </head>
 <body>
   <main>
     <h1>Create Sales Invoice</h1>
-    <p><a href="/emw/">Back to Purchase Orders</a></p>
+    <a href="/emw/" class="back-link">&#8592; Back to Purchase Orders</a>
 
-    <form id="salesInvoiceForm" aria-label="Create sales invoice form">
-      <label for="invoiceNumber">Invoice Number</label>
-      <input id="invoiceNumber" name="invoiceNumber" type="text" required placeholder="SI-2026-0003">
+    <div class="card">
+      <form id="salesInvoiceForm" aria-label="Create sales invoice form">
+        <div class="form-stack">
+          <div class="form-field">
+            <label for="invoiceNumber">Invoice Number</label>
+            <input id="invoiceNumber" name="invoiceNumber" type="text" required placeholder="SI-2026-0003">
+          </div>
+          <div class="form-field">
+            <label for="purchaseOrderId">Purchase Order ID</label>
+            <input id="purchaseOrderId" name="purchaseOrderId" type="number" min="1" required placeholder="1">
+          </div>
+          <div class="form-field">
+            <label for="customerName">Customer</label>
+            <select id="customerName" name="customerName" required>
+              <option value="">Select customer</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="invoiceDate">Invoice Date</label>
+            <input id="invoiceDate" name="invoiceDate" type="date" required>
+          </div>
+        </div>
 
-      <label for="purchaseOrderId">Purchase Order ID</label>
-      <input id="purchaseOrderId" name="purchaseOrderId" type="number" min="1" required placeholder="1">
+        <h2>Invoice Item</h2>
+        <div class="item-row">
+          <div class="form-field">
+            <label for="productName">Product</label>
+            <input id="productName" name="productName" type="text" required placeholder="Stainless Hinge with Handle">
+          </div>
+          <div class="form-field">
+            <label for="quantity">Quantity</label>
+            <input id="quantity" name="quantity" type="number" min="1" required placeholder="1">
+          </div>
+          <div class="form-field">
+            <label for="unitPrice">Unit Price</label>
+            <input id="unitPrice" name="unitPrice" type="number" min="0" step="0.01" required placeholder="125.50">
+          </div>
+        </div>
 
-      <label for="customerName">Customer</label>
-      <select id="customerName" name="customerName" required>
-        <option value="">Select customer</option>
-      </select>
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">Create Sales Invoice</button>
+          <button type="button" id="resetButton" class="btn btn-secondary">Reset</button>
+        </div>
+      </form>
+    </div>
 
-      <label for="invoiceDate">Invoice Date</label>
-      <input id="invoiceDate" name="invoiceDate" type="date" required>
-
-      <h2>Invoice Item</h2>
-
-      <label for="productName">Product</label>
-      <input id="productName" name="productName" type="text" required placeholder="Stainless Hinge with Handle">
-
-      <label for="quantity">Quantity</label>
-      <input id="quantity" name="quantity" type="number" min="1" required placeholder="1">
-
-      <label for="unitPrice">Unit Price</label>
-      <input id="unitPrice" name="unitPrice" type="number" min="0" step="0.01" required placeholder="125.50">
-
-      <button type="submit">Create Sales Invoice</button>
-      <button type="button" id="resetButton">Reset</button>
-    </form>
-
-    <p id="status" role="status" aria-live="polite"></p>
+    <p id="status" class="status-msg" role="status" aria-live="polite"></p>
   </main>
 
   <script>

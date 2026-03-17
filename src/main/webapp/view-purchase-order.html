@@ -4,50 +4,57 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Purchase Order Detail</title>
+  <link rel="stylesheet" href="/emw/style.css">
 </head>
 <body>
   <main>
     <h1>Purchase Order Detail</h1>
-    <p><a href="/emw/">Back to Purchase Orders</a></p>
+    <a href="/emw/" class="back-link">&#8592; Back to Purchase Orders</a>
 
-    <p id="status" role="status" aria-live="polite"></p>
+    <p id="status" class="status-msg" role="status" aria-live="polite"></p>
 
     <section id="orderDetail" hidden>
-      <table>
-        <tbody>
-          <tr><th>ID</th><td id="detailId"></td></tr>
-          <tr><th>Order Number</th><td id="detailOrderNumber"></td></tr>
-          <tr><th>Customer</th><td id="detailCustomer"></td></tr>
-          <tr><th>Order Date</th><td id="detailOrderDate"></td></tr>
-          <tr><th>Payment Status</th><td id="detailPaymentStatus"></td></tr>
-        </tbody>
-      </table>
+      <div class="table-wrapper">
+        <table>
+          <tbody class="detail-tbody">
+            <tr><th>ID</th><td id="detailId"></td></tr>
+            <tr><th>Order Number</th><td id="detailOrderNumber"></td></tr>
+            <tr><th>Customer</th><td id="detailCustomer"></td></tr>
+            <tr><th>Order Date</th><td id="detailOrderDate"></td></tr>
+            <tr><th>Payment Status</th><td id="detailPaymentStatus"></td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <h2>Purchase Items</h2>
-      <table id="purchaseItemsTable">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody id="purchaseItemsBody"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table id="purchaseItemsTable">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="purchaseItemsBody"></tbody>
+        </table>
+      </div>
 
       <h2>Sales Invoice Items</h2>
-      <table id="salesInvoiceItemsTable">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Unit Price</th>
-            <th>Subtotal</th>
-          </tr>
-        </thead>
-        <tbody id="salesInvoiceItemsBody"></tbody>
-      </table>
+      <div class="table-wrapper">
+        <table id="salesInvoiceItemsTable">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Unit Price</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="salesInvoiceItemsBody"></tbody>
+        </table>
+      </div>
     </section>
   </main>
 
@@ -154,7 +161,16 @@
         document.getElementById('detailOrderNumber').textContent = order.orderNumber ?? '';
         document.getElementById('detailCustomer').textContent = order.customerName ?? '';
         document.getElementById('detailOrderDate').textContent = order.orderDate ?? '';
-        document.getElementById('detailPaymentStatus').textContent = order.paymentStatus ?? '';
+        const detailStatusEl = document.getElementById('detailPaymentStatus');
+        const detailStatusVal = order.paymentStatus ?? '';
+        if (detailStatusVal) {
+          const badge = document.createElement('span');
+          badge.className = `badge ${detailStatusVal === 'FULLY_PAID' ? 'badge-paid' : 'badge-ongoing'}`;
+          badge.textContent = detailStatusVal;
+          detailStatusEl.appendChild(badge);
+        } else {
+          detailStatusEl.textContent = '';
+        }
 
         renderPurchaseItems(order.purchaseItems);
         renderSalesInvoiceItems(order.salesInvoiceItems);

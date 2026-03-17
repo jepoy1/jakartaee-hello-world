@@ -53,6 +53,17 @@ public class UiResource {
         return pageResponse("/view-purchase-order.html", "View purchase order page not found");
     }
 
+    @GET
+    @Path("style.css")
+    @Produces("text/css")
+    public Response getStylesheet() {
+        InputStream stream = servletContext.getResourceAsStream("/style.css");
+        if (stream == null) {
+            throw new NotFoundException("Stylesheet not found");
+        }
+        return Response.ok(stream, "text/css").build();
+    }
+
     private Response indexResponse() {
         return pageResponse("/index.html", "UI page not found");
     }

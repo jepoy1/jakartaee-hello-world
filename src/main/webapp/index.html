@@ -4,49 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Purchase Orders</title>
+  <link rel="stylesheet" href="/emw/style.css">
 </head>
 <body>
   <main>
     <h1>Purchase Orders</h1>
 
-    <p>
+    <nav class="nav">
       <a href="/emw/create-purchase-order.html">Create Purchase Order</a>
-      |
+      <span class="sep">|</span>
       <a href="/emw/create-sales-invoice.html">Create Sales Invoice</a>
-    </p>
+    </nav>
 
-    <form id="filters" aria-label="Purchase order filters">
-      <label for="paymentStatus">Payment Status</label>
-      <select id="paymentStatus" name="paymentStatus">
-        <option value="">All</option>
-        <option value="ONGOING">ONGOING</option>
-        <option value="FULLY_PAID">FULLY_PAID</option>
-      </select>
+    <div class="card">
+      <form id="filters" aria-label="Purchase order filters">
+        <div class="form-row">
+          <div class="form-field">
+            <label for="paymentStatus">Payment Status</label>
+            <select id="paymentStatus" name="paymentStatus">
+              <option value="">All</option>
+              <option value="ONGOING">ONGOING</option>
+              <option value="FULLY_PAID">FULLY_PAID</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="customer">Customer</label>
+            <select id="customer" name="customer">
+              <option value="">All</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:8px;">
+            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="button" id="clearFilters" class="btn btn-secondary">Clear</button>
+          </div>
+        </div>
+      </form>
+    </div>
 
-      <label for="customer">Customer</label>
-      <select id="customer" name="customer">
-        <option value="">All</option>
-      </select>
+    <p id="status" class="status-msg" role="status" aria-live="polite"></p>
 
-      <button type="submit">Search</button>
-      <button type="button" id="clearFilters">Clear</button>
-    </form>
-
-    <p id="status" role="status" aria-live="polite"></p>
-
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Order Number</th>
-          <th>Customer</th>
-          <th>Order Date</th>
-          <th>Payment Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="resultsBody"></tbody>
-    </table>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Order Number</th>
+            <th>Customer</th>
+            <th>Order Date</th>
+            <th>Payment Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+      </table>
+    </div>
   </main>
 
   <script>
@@ -94,13 +105,20 @@
         row.appendChild(orderDateCell);
 
         const paymentStatusCell = document.createElement('td');
-        paymentStatusCell.textContent = order.paymentStatus ?? '';
+        const statusVal = order.paymentStatus ?? '';
+        if (statusVal) {
+          const badge = document.createElement('span');
+          badge.className = `badge ${statusVal === 'FULLY_PAID' ? 'badge-paid' : 'badge-ongoing'}`;
+          badge.textContent = statusVal;
+          paymentStatusCell.appendChild(badge);
+        }
         row.appendChild(paymentStatusCell);
 
         const actionsCell = document.createElement('td');
         const viewLink = document.createElement('a');
         viewLink.href = `/emw/view-purchase-order.html?id=${order.id}`;
         viewLink.textContent = 'View';
+        viewLink.className = 'action-link';
         actionsCell.appendChild(viewLink);
         row.appendChild(actionsCell);
 
