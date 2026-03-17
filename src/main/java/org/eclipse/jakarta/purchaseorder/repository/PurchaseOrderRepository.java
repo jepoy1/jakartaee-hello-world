@@ -17,6 +17,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.eclipse.jakarta.purchaseorder.model.Customer;
 import org.eclipse.jakarta.purchaseorder.model.Product;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrder;
+import org.eclipse.jakarta.purchaseorder.model.PurchaseOrderItem;
 import org.eclipse.jakarta.purchaseorder.model.SalesInvoice;
 import org.eclipse.jakarta.purchaseorder.model.SalesInvoiceItem;
 
@@ -40,6 +41,27 @@ public class PurchaseOrderRepository {
         try (SqlSession sqlSession = sqlSessionFactory.openSession(true)) {
             PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
             mapper.insertPurchaseOrder(purchaseOrder);
+        }
+
+        return purchaseOrder;
+    }
+
+    public PurchaseOrder createWithItems(PurchaseOrder purchaseOrder, List<PurchaseOrderItem> items) {
+        logger.info("Creating purchase order with items " + purchaseOrder.getOrderNumber());
+        try (SqlSession sqlSession = sqlSessionFactory.openSession(false)) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+            mapper.insertPurchaseOrder(purchaseOrder);
+
+            for (PurchaseOrderItem item : items) {
+                mapper.insertPurchaseOrderItem(
+                    purchaseOrder.getId(),
+                    item.getProduct().getId(),
+                    item.getQuantity(),
+                    item.getUnitPrice()
+                );
+            }
+
+            sqlSession.commit();
         }
 
         return purchaseOrder;
@@ -148,6 +170,30 @@ public class PurchaseOrderRepository {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
             return Optional.ofNullable(mapper.findCustomerByName(name));
+        }
+    }
+
+    public Optional<Product> findProductByName(String name) {
+        logger.info("Getting product by name " + name);
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+            return Optional.ofNullable(mapper.findProductByName(name));
+        }
+    }
+
+    public List<String> findAllCustomerNames() {
+        logger.info("Getting all customer names");
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+            return mapper.findAllCustomerNames();
+        }
+    }
+
+    public List<String> findAllProductNames() {
+        logger.info("Getting all product names");
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+            return mapper.findAllProductNames();
         }
     }
 

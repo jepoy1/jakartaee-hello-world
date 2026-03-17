@@ -9,6 +9,12 @@
   <main>
     <h1>Purchase Orders</h1>
 
+    <p>
+      <a href="/emw/create-purchase-order.html">Create Purchase Order</a>
+      |
+      <a href="/emw/create-sales-invoice.html">Create Sales Invoice</a>
+    </p>
+
     <form id="filters" aria-label="Purchase order filters">
       <label for="paymentStatus">Payment Status</label>
       <select id="paymentStatus" name="paymentStatus">
@@ -20,11 +26,6 @@
       <label for="customer">Customer</label>
       <select id="customer" name="customer">
         <option value="">All</option>
-        <option value="Centro Manufacturing">Centro Manufacturing</option>
-        <option value="Hino Motors Philippines">Hino Motors Philippines</option>
-        <option value="Kyoei Kogyo">Kyoei Kogyo</option>
-        <option value="Mitsubishi Motors Philippines">Mitsubishi Motors Philippines</option>
-        <option value="Del Monte Motors">Del Monte Motors</option>
       </select>
 
       <button type="submit">Search</button>
@@ -120,6 +121,40 @@
       customerInput.value = searchParams.get('customer') ?? '';
     }
 
+    async function loadCustomerOptions(selectedCustomer) {
+      const response = await fetch('/emw/customers', {
+        headers: {
+          Accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load customers with status ${response.status}`);
+      }
+
+      const customerNames = await response.json();
+      const customers = [...new Set(
+        (Array.isArray(customerNames) ? customerNames : [])
+          .filter((name) => typeof name === 'string' && name.trim().length > 0)
+      )].sort((first, second) => first.localeCompare(second));
+
+      customerInput.replaceChildren();
+
+      const allOption = document.createElement('option');
+      allOption.value = '';
+      allOption.textContent = 'All';
+      customerInput.appendChild(allOption);
+
+      customers.forEach((customerName) => {
+        const option = document.createElement('option');
+        option.value = customerName;
+        option.textContent = customerName;
+        customerInput.appendChild(option);
+      });
+
+      customerInput.value = selectedCustomer ?? '';
+    }
+
     async function loadPurchaseOrders() {
       const params = buildQueryParams();
       const queryString = params.toString();
@@ -165,10 +200,16 @@
       await loadPurchaseOrders();
     });
 
-    (function init() {
+    (async function init() {
       const currentParams = new URLSearchParams(window.location.search);
       applyQueryToInputs(currentParams);
-      loadPurchaseOrders();
+      try {
+        await loadCustomerOptions(customerInput.value);
+      } catch (error) {
+        setStatus(`Failed to load customers: ${error.message}`);
+      }
+
+      await loadPurchaseOrders();
     })();
   </script>
 </body>

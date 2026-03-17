@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Purchase Order</title>
+</head>
+<body>
+  <main>
+    <h1>Create Purchase Order</h1>
+    <p><a href="/emw/">Back to Purchase Orders</a></p>
+
+    <form id="purchaseOrderForm" aria-label="Create purchase order form">
+      <label for="orderNumber">Order Number</label>
+      <input id="orderNumber" name="orderNumber" type="text" required placeholder="PO-2026-0003">
+
+      <label for="customerName">Customer</label>
+      <select id="customerName" name="customerName" required>
+        <option value="">Select customer</option>
+      </select>
+
+      <label for="orderDate">Order Date</label>
+      <input id="orderDate" name="orderDate" type="date" required>
+
+      <h2>Purchase Items</h2>
+      <div id="itemsContainer"></div>
+      <button type="button" id="addItemButton">Add Item</button>
+
+      <button type="submit">Create Purchase Order</button>
+      <button type="button" id="resetButton">Reset</button>
+    </form>
+
+    <p id="status" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const form = document.getElementById('purchaseOrderForm');
+    const resetButton = document.getElementById('resetButton');
+    const addItemButton = document.getElementById('addItemButton');
+    const itemsContainer = document.getElementById('itemsContainer');
+    const statusEl = document.getElementById('status');
+    let productNames = [];
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    function createProductSelect(selectedProductName = '') {
+      const productSelect = document.createElement('select');
+      productSelect.className = 'item-product';
+      productSelect.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select product';
+      productSelect.appendChild(defaultOption);
+
+      productNames.forEach((productName) => {
+        const option = document.createElement('option');
+        option.value = productName;
+        option.textContent = productName;
+        productSelect.appendChild(option);
+      });
+
+      productSelect.value = selectedProductName;
+      return productSelect;
+    }
+
+    function createItemRow(item = {}) {
+      const row = document.createElement('div');
+
+      const productLabel = document.createElement('label');
+      productLabel.textContent = 'Product Name';
+      row.appendChild(productLabel);
+
+      const productSelect = createProductSelect(item.productName ?? '');
+      row.appendChild(productSelect);
+
+      const quantityLabel = document.createElement('label');
+      quantityLabel.textContent = 'Quantity';
+      row.appendChild(quantityLabel);
+
+      const quantityInput = document.createElement('input');
+      quantityInput.type = 'number';
+      quantityInput.className = 'item-quantity';
+      quantityInput.min = '1';
+      quantityInput.required = true;
+      quantityInput.placeholder = '1';
+      quantityInput.value = item.quantity ?? '';
+      row.appendChild(quantityInput);
+
+      const unitPriceLabel = document.createElement('label');
+      unitPriceLabel.textContent = 'Unit Price';
+      row.appendChild(unitPriceLabel);
+
+      const unitPriceInput = document.createElement('input');
+      unitPriceInput.type = 'number';
+      unitPriceInput.className = 'item-unit-price';
+      unitPriceInput.min = '0';
+      unitPriceInput.step = '0.01';
+      unitPriceInput.required = true;
+      unitPriceInput.placeholder = '125.50';
+      unitPriceInput.value = item.unitPrice ?? '';
+      row.appendChild(unitPriceInput);
+
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.textContent = 'Remove Item';
+      removeButton.addEventListener('click', () => {
+        if (itemsContainer.children.length > 1) {
+          row.remove();
+        }
+      });
+      row.appendChild(removeButton);
+
+      itemsContainer.appendChild(row);
+    }
+
+    function readItemsFromForm() {
+      return [...itemsContainer.children].map((row) => ({
+        productName: row.querySelector('.item-product').value.trim(),
+        quantity: Number(row.querySelector('.item-quantity').value),
+        unitPrice: Number(row.querySelector('.item-unit-price').value)
+      }));
+    }
+
+    async function loadCustomerOptions() {
+      const response = await fetch('/emw/customers', {
+        headers: {
+          Accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load customers with status ${response.status}`);
+      }
+
+      const customerNames = await response.json();
+      const customers = [...new Set(
+        (Array.isArray(customerNames) ? customerNames : [])
+          .filter((name) => typeof name === 'string' && name.trim().length > 0)
+      )].sort((first, second) => first.localeCompare(second));
+
+      const selectedValue = form.customerName.value;
+      form.customerName.replaceChildren();
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select customer';
+      form.customerName.appendChild(defaultOption);
+
+      customers.forEach((customerName) => {
+        const option = document.createElement('option');
+        option.value = customerName;
+        option.textContent = customerName;
+        form.customerName.appendChild(option);
+      });
+
+      form.customerName.value = selectedValue;
+    }
+
+    async function loadProductOptions() {
+      const response = await fetch('/emw/products', {
+        headers: {
+          Accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load products with status ${response.status}`);
+      }
+
+      const productNameValues = await response.json();
+      productNames = [...new Set(
+        (Array.isArray(productNameValues) ? productNameValues : [])
+          .filter((name) => typeof name === 'string' && name.trim().length > 0)
+      )].sort((first, second) => first.localeCompare(second));
+
+      const currentItems = readItemsFromForm();
+      itemsContainer.replaceChildren();
+
+      if (currentItems.length === 0) {
+        createItemRow();
+        return;
+      }
+
+      currentItems.forEach((item) => createItemRow(item));
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        orderNumber: form.orderNumber.value.trim(),
+        customerName: form.customerName.value,
+        orderDate: form.orderDate.value,
+        purchaseItems: readItemsFromForm()
+      };
+
+      setStatus('Creating purchase order...');
+
+      try {
+        const response = await fetch('/emw/purchase-order-with-items', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || `Request failed with status ${response.status}`);
+        }
+
+        const created = await response.json();
+        setStatus(`Created purchase order ${created.orderNumber ?? payload.orderNumber}.`);
+        alert(`Purchase order ${created.orderNumber ?? payload.orderNumber} created successfully.`);
+        form.reset();
+        itemsContainer.replaceChildren();
+        createItemRow();
+        window.location.href = '/emw/';
+      } catch (error) {
+        setStatus(`Failed to create purchase order: ${error.message}`);
+      }
+    });
+
+    resetButton.addEventListener('click', () => {
+      form.reset();
+      itemsContainer.replaceChildren();
+      createItemRow();
+      setStatus('');
+    });
+
+    addItemButton.addEventListener('click', () => {
+      createItemRow();
+    });
+
+    (async function init() {
+      createItemRow();
+
+      try {
+        await loadCustomerOptions();
+        await loadProductOptions();
+      } catch (error) {
+        setStatus(`Failed to load options: ${error.message}`);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -131,3 +131,10 @@ INSERT INTO sales_invoice_items (id, sales_invoice_id, product_id, quantity, uni
 VALUES (2, 1, 2, 10, 8.99);
 INSERT INTO sales_invoice_items (id, sales_invoice_id, product_id, quantity, unit_price)
 VALUES (3, 2, 3, 3, 75.00);
+
+ALTER TABLE customer ALTER COLUMN id RESTART WITH 6;
+ALTER TABLE products ALTER COLUMN id RESTART WITH 15;
+ALTER TABLE purchase_order ALTER COLUMN id RESTART WITH 3;
+ALTER TABLE purchase_order_items ALTER COLUMN id RESTART WITH 4;
+ALTER TABLE sales_invoice ALTER COLUMN id RESTART WITH 3;
+ALTER TABLE sales_invoice_items ALTER COLUMN id RESTART WITH 4;

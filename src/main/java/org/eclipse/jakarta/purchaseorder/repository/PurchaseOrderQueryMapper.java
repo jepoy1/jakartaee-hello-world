@@ -64,6 +64,17 @@ public interface PurchaseOrderQueryMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insertPurchaseOrder(PurchaseOrder purchaseOrder);
 
+        @Insert({
+            "INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_price)",
+            "VALUES (#{purchaseOrderId}, #{productId}, #{quantity}, #{unitPrice})"
+        })
+        int insertPurchaseOrderItem(
+            @Param("purchaseOrderId") Long purchaseOrderId,
+            @Param("productId") Long productId,
+            @Param("quantity") Integer quantity,
+            @Param("unitPrice") java.math.BigDecimal unitPrice
+        );
+
     @Update("UPDATE purchase_order SET order_number = #{orderNumber}, customer_id = #{customer.id}, order_date = #{orderDate} WHERE id = #{id}")
     int updatePurchaseOrder(PurchaseOrder purchaseOrder);
 
@@ -75,6 +86,12 @@ public interface PurchaseOrderQueryMapper {
 
     @Select("SELECT c.id, c.name, c.email FROM customer c WHERE c.name = #{name}")
     Customer findCustomerByName(@Param("name") String name);
+
+    @Select("SELECT c.name FROM customer c ORDER BY c.name")
+    List<String> findAllCustomerNames();
+
+    @Select("SELECT p.product_name FROM products p ORDER BY p.product_name")
+    List<String> findAllProductNames();
 
     @Select({
         "SELECT poi.id, poi.purchase_order_id, poi.product_id, poi.quantity, poi.unit_price",

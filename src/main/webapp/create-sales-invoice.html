@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Sales Invoice</title>
+</head>
+<body>
+  <main>
+    <h1>Create Sales Invoice</h1>
+    <p><a href="/emw/">Back to Purchase Orders</a></p>
+
+    <form id="salesInvoiceForm" aria-label="Create sales invoice form">
+      <label for="invoiceNumber">Invoice Number</label>
+      <input id="invoiceNumber" name="invoiceNumber" type="text" required placeholder="SI-2026-0003">
+
+      <label for="purchaseOrderId">Purchase Order ID</label>
+      <input id="purchaseOrderId" name="purchaseOrderId" type="number" min="1" required placeholder="1">
+
+      <label for="customerName">Customer</label>
+      <select id="customerName" name="customerName" required>
+        <option value="">Select customer</option>
+      </select>
+
+      <label for="invoiceDate">Invoice Date</label>
+      <input id="invoiceDate" name="invoiceDate" type="date" required>
+
+      <h2>Invoice Item</h2>
+
+      <label for="productName">Product</label>
+      <input id="productName" name="productName" type="text" required placeholder="Stainless Hinge with Handle">
+
+      <label for="quantity">Quantity</label>
+      <input id="quantity" name="quantity" type="number" min="1" required placeholder="1">
+
+      <label for="unitPrice">Unit Price</label>
+      <input id="unitPrice" name="unitPrice" type="number" min="0" step="0.01" required placeholder="125.50">
+
+      <button type="submit">Create Sales Invoice</button>
+      <button type="button" id="resetButton">Reset</button>
+    </form>
+
+    <p id="status" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const form = document.getElementById('salesInvoiceForm');
+    const resetButton = document.getElementById('resetButton');
+    const statusEl = document.getElementById('status');
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    async function loadCustomerOptions() {
+      const response = await fetch('/emw/customers', {
+        headers: {
+          Accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load customers with status ${response.status}`);
+      }
+
+      const customerNames = await response.json();
+      const customers = [...new Set(
+        (Array.isArray(customerNames) ? customerNames : [])
+          .filter((name) => typeof name === 'string' && name.trim().length > 0)
+      )].sort((first, second) => first.localeCompare(second));
+
+      const selectedValue = form.customerName.value;
+      form.customerName.replaceChildren();
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select customer';
+      form.customerName.appendChild(defaultOption);
+
+      customers.forEach((customerName) => {
+        const option = document.createElement('option');
+        option.value = customerName;
+        option.textContent = customerName;
+        form.customerName.appendChild(option);
+      });
+
+      form.customerName.value = selectedValue;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        invoiceNumber: form.invoiceNumber.value.trim(),
+        purchaseOrderId: Number(form.purchaseOrderId.value),
+        customerName: form.customerName.value,
+        invoiceDate: form.invoiceDate.value,
+        salesInvoiceItems: [
+          {
+            productName: form.productName.value.trim(),
+            quantity: Number(form.quantity.value),
+            unitPrice: Number(form.unitPrice.value)
+          }
+        ]
+      };
+
+      setStatus('Creating sales invoice...');
+
+      try {
+        const response = await fetch('/emw/sales-invoice', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || `Request failed with status ${response.status}`);
+        }
+
+        const created = await response.json();
+        setStatus(`Created sales invoice ${created.invoiceNumber ?? payload.invoiceNumber}.`);
+        alert(`Sales invoice ${created.invoiceNumber ?? payload.invoiceNumber} created successfully.`);
+        form.reset();
+        window.location.href = '/emw/';
+      } catch (error) {
+        setStatus(`Failed to create sales invoice: ${error.message}`);
+      }
+    });
+
+    resetButton.addEventListener('click', () => {
+      form.reset();
+      setStatus('');
+    });
+
+    (async function init() {
+      try {
+        await loadCustomerOptions();
+      } catch (error) {
+        setStatus(`Failed to load customers: ${error.message}`);
+      }
+    })();
+  </script>
+</body>
+</html>
