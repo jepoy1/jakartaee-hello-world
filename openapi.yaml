@@ -24,7 +24,7 @@ paths:
               sample:
                 value:
                   orderNumber: PO-2026-0003
-                  customerName: Acme Trading
+                  customerName: Centro Manufacturing
                   orderDate: '2026-03-10'
       responses:
         '201':
@@ -72,12 +72,12 @@ paths:
                   value:
                     - id: 1
                       orderNumber: PO-2026-0001
-                      customerName: Acme Trading
+                      customerName: Centro Manufacturing
                       orderDate: '2026-03-01'
                       paymentStatus: FULLY_PAID
                     - id: 2
                       orderNumber: PO-2026-0002
-                      customerName: Blue River Supplies
+                      customerName: Hino Motors Philippines
                       orderDate: '2026-03-05'
                       paymentStatus: ONGOING
   /purchase-orders/{id}:
@@ -107,25 +107,25 @@ paths:
                   value:
                     id: 1
                     orderNumber: PO-2026-0001
-                    customerName: Acme Trading
+                    customerName: Centro Manufacturing
                     orderDate: '2026-03-01'
                     paymentStatus: ONGOING
                     purchaseItems:
                       - productId: 1
-                        productName: Laptop Dock
+                        productName: Stainless Hinge with Handle
                         quantity: 3
                         unitPrice: 125.50
                       - productId: 2
-                        productName: USB-C Cable
+                        productName: Stainless Hinge without Handle
                         quantity: 10
                         unitPrice: 8.99
                     salesInvoiceItems:
                       - productId: 1
-                        productName: Laptop Dock
+                        productName: Stainless Hinge with Handle
                         quantity: 2
                         unitPrice: 125.50
                       - productId: 2
-                        productName: USB-C Cable
+                        productName: Stainless Hinge without Handle
                         quantity: 10
                         unitPrice: 8.99
         '404':
@@ -148,13 +148,13 @@ paths:
                 value:
                   invoiceNumber: SI-2026-0003
                   purchaseOrderId: 1
-                  customerName: Acme Trading
+                  customerName: Centro Manufacturing
                   invoiceDate: '2026-03-15'
                   salesInvoiceItems:
-                    - productName: Laptop Dock
+                    - productName: Stainless Hinge with Handle
                       quantity: 1
                       unitPrice: 125.50
-                    - productName: USB-C Cable
+                    - productName: Stainless Hinge without Handle
                       quantity: 2
                       unitPrice: 8.99
       responses:
@@ -181,7 +181,7 @@ components:
           example: PO-2026-0001
         customerName:
           type: string
-          example: Acme Trading
+          example: Centro Manufacturing
         orderDate:
           type: string
           format: date
@@ -205,7 +205,7 @@ components:
           example: PO-2026-0001
         customerName:
           type: string
-          example: Acme Trading
+          example: Centro Manufacturing
         orderDate:
           type: string
           format: date
@@ -234,7 +234,7 @@ components:
           example: 1
         productName:
           type: string
-          example: Laptop Dock
+          example: Stainless Hinge with Handle
         quantity:
           type: integer
           format: int32
@@ -253,7 +253,7 @@ components:
           example: 1
         productName:
           type: string
-          example: Laptop Dock
+          example: Stainless Hinge with Handle
         quantity:
           type: integer
           format: int32
@@ -279,7 +279,7 @@ components:
           example: 1
         customerName:
           type: string
-          example: Acme Trading
+          example: Centro Manufacturing
         invoiceDate:
           type: string
           format: date
@@ -293,7 +293,7 @@ components:
       properties:
         productName:
           type: string
-          example: Laptop Dock
+          example: Stainless Hinge with Handle
         quantity:
           type: integer
           format: int32

@@ -36,7 +36,7 @@ class PurchaseOrderRepositoryTest {
         PurchaseOrder firstOrder = purchaseOrders.getFirst();
         assertEquals("PO-2026-0001", firstOrder.getOrderNumber());
         assertNotNull(firstOrder.getCustomer());
-        assertEquals("Acme Trading", firstOrder.getCustomer().getName());
+        assertEquals("Centro Manufacturing", firstOrder.getCustomer().getName());
         assertEquals(2, firstOrder.getItems().size());
         assertEquals(new BigDecimal("125.50"), firstOrder.getItems().getFirst().getUnitPrice());
     }
@@ -55,24 +55,24 @@ class PurchaseOrderRepositoryTest {
 
     @Test
     void findAllWithCustomerUsesSeedDataCorrectly() {
-        List<PurchaseOrder> acmeOrders = repository.findAll(null, "Acme");
-        List<PurchaseOrder> blueRiverOrders = repository.findAll(null, "Blue River");
+        List<PurchaseOrder> centroOrders = repository.findAll(null, "Centro");
+        List<PurchaseOrder> hinoOrders = repository.findAll(null, "Hino");
 
-        assertEquals(1, acmeOrders.size());
-        assertEquals("PO-2026-0001", acmeOrders.getFirst().getOrderNumber());
+        assertEquals(1, centroOrders.size());
+        assertEquals("PO-2026-0001", centroOrders.getFirst().getOrderNumber());
 
-        assertEquals(1, blueRiverOrders.size());
-        assertEquals("PO-2026-0002", blueRiverOrders.getFirst().getOrderNumber());
+        assertEquals(1, hinoOrders.size());
+        assertEquals("PO-2026-0002", hinoOrders.getFirst().getOrderNumber());
     }
 
     @Test
     void findAllWithPaymentStatusAndCustomerUsesCombinedFilters() {
-        List<PurchaseOrder> ongoingAcmeOrders = repository.findAll("ONGOING", "Acme");
-        List<PurchaseOrder> fullyPaidAcmeOrders = repository.findAll("FULLY_PAID", "Acme");
+        List<PurchaseOrder> ongoingCentroOrders = repository.findAll("ONGOING", "Centro");
+        List<PurchaseOrder> fullyPaidCentroOrders = repository.findAll("FULLY_PAID", "Centro");
 
-        assertEquals(1, ongoingAcmeOrders.size());
-        assertEquals("PO-2026-0001", ongoingAcmeOrders.getFirst().getOrderNumber());
-        assertTrue(fullyPaidAcmeOrders.isEmpty());
+        assertEquals(1, ongoingCentroOrders.size());
+        assertEquals("PO-2026-0001", ongoingCentroOrders.getFirst().getOrderNumber());
+        assertTrue(fullyPaidCentroOrders.isEmpty());
     }
 
     @Test
@@ -83,7 +83,7 @@ class PurchaseOrderRepositoryTest {
         assertEquals("ONGOING", purchaseOrder.getPaymentStatus());
         assertEquals(2, purchaseOrder.getItems().size());
         assertEquals(2, purchaseOrder.getSalesInvoiceItems().size());
-        assertEquals("Laptop Dock", purchaseOrder.getSalesInvoiceItems().getFirst().getProduct().getProductName());
+        assertEquals("Stainless Hinge with Handle", purchaseOrder.getSalesInvoiceItems().getFirst().getProduct().getProductName());
     }
 
     @Test
@@ -135,17 +135,17 @@ class PurchaseOrderRepositoryTest {
 
     @Test
     void findCustomerByNameReturnsSeededCustomer() {
-        var customer = repository.findCustomerByName("Acme Trading").orElseThrow();
+        var customer = repository.findCustomerByName("Centro Manufacturing").orElseThrow();
 
         assertEquals(1L, customer.getId());
-        assertEquals("contact@acmetrading.com", customer.getEmail());
+        assertEquals("contact@centro.com", customer.getEmail());
     }
 
     @Test
     void createSalesInvoicePersistsAndAffectsPaymentStatus() {
         SalesInvoiceItem salesInvoiceItem = new SalesInvoiceItem();
         Product product = new Product();
-        product.setProductName("Laptop Dock");
+        product.setProductName("Stainless Hinge with Handle");
         salesInvoiceItem.setProduct(product);
         salesInvoiceItem.setQuantity(1);
         salesInvoiceItem.setUnitPrice(new BigDecimal("125.50"));
@@ -153,7 +153,7 @@ class PurchaseOrderRepositoryTest {
         var createdSalesInvoice = repository.createSalesInvoice(
             "SI-2026-TEST",
             1L,
-            "Acme Trading",
+            "Centro Manufacturing",
             LocalDate.of(2026, 3, 16),
             List.of(salesInvoiceItem)
         );
@@ -169,7 +169,7 @@ class PurchaseOrderRepositoryTest {
     void createSalesInvoiceThrowsWhenCustomerDoesNotMatchPurchaseOrder() {
         SalesInvoiceItem salesInvoiceItem = new SalesInvoiceItem();
         Product product = new Product();
-        product.setProductName("Laptop Dock");
+        product.setProductName("Stainless Hinge with Handle");
         salesInvoiceItem.setProduct(product);
         salesInvoiceItem.setQuantity(1);
         salesInvoiceItem.setUnitPrice(new BigDecimal("125.50"));
@@ -179,7 +179,7 @@ class PurchaseOrderRepositoryTest {
             () -> repository.createSalesInvoice(
                 "SI-2026-INVALID",
                 1L,
-                "Blue River Supplies",
+                "Hino Motors Philippines",
                 LocalDate.of(2026, 3, 16),
                 List.of(salesInvoiceItem)
             )

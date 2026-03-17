@@ -30,18 +30,18 @@ class PurchaseOrderResourceApiTest {
 
     @Test
     void listPurchaseOrdersFiltersByCustomerQueryParam() {
-        List<PurchaseOrderDTO> purchaseOrders = resource.listPurchaseOrders(null, "Acme");
+        List<PurchaseOrderDTO> purchaseOrders = resource.listPurchaseOrders(null, "Centro");
 
         assertEquals(1, purchaseOrders.size());
         PurchaseOrderDTO purchaseOrder = purchaseOrders.getFirst();
         assertEquals("PO-2026-0001", purchaseOrder.getOrderNumber());
-        assertEquals("Acme Trading", purchaseOrder.getCustomerName());
+        assertEquals("Centro Manufacturing", purchaseOrder.getCustomerName());
         assertEquals(PurchaseOrderDTO.PaymentStatusEnum.ONGOING, purchaseOrder.getPaymentStatus());
     }
 
     @Test
     void listPurchaseOrdersAppliesCustomerAndPaymentStatusTogether() {
-        List<PurchaseOrderDTO> filteredPurchaseOrders = resource.listPurchaseOrders("FULLY_PAID", "Acme");
+        List<PurchaseOrderDTO> filteredPurchaseOrders = resource.listPurchaseOrders("FULLY_PAID", "Centro");
 
         assertTrue(filteredPurchaseOrders.isEmpty());
     }

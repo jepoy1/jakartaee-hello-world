@@ -68,20 +68,26 @@ ALTER TABLE IF EXISTS purchase_order DROP COLUMN IF EXISTS status;
 ALTER TABLE IF EXISTS purchase_order DROP COLUMN IF EXISTS delivery_status;
 ALTER TABLE IF EXISTS purchase_order DROP COLUMN IF EXISTS payment_status;
 
-INSERT INTO customer (id, name, email)
-VALUES (1, 'Acme Trading', 'contact@acmetrading.com');
+INSERT INTO customer (id, name, email) VALUES (1, 'Centro Manufacturing', 'contact@centro.com');
+INSERT INTO customer (id, name, email) VALUES (2, 'Hino Motors Philippines', NULL);
+INSERT INTO customer (id, name, email) VALUES (3, 'Kyoei Kogyo', NULL);
+INSERT INTO customer (id, name, email) VALUES (4, 'Mitsubishi Motors Philippines', NULL);
+INSERT INTO customer (id, name, email) VALUES (5, 'Del Monte Motors', NULL);
 
-INSERT INTO customer (id, name, email)
-VALUES (2, 'Blue River Supplies', 'info@blueriver.com');
-
-INSERT INTO products (id, product_name, description)
-VALUES (1, 'Laptop Dock', 'USB-C docking station with HDMI and Ethernet ports.');
-
-INSERT INTO products (id, product_name, description)
-VALUES (2, 'USB-C Cable', 'Durable 1-meter USB-C charging and data cable.');
-
-INSERT INTO products (id, product_name, description)
-VALUES (3, 'Mechanical Keyboard', 'Full-size mechanical keyboard with tactile switches.');
+INSERT INTO products (id, product_name, description) VALUES (1, 'Stainless Hinge with Handle', NULL);
+INSERT INTO products (id, product_name, description) VALUES (2, 'Stainless Hinge without Handle', NULL);
+INSERT INTO products (id, product_name, description) VALUES (3, 'Dropside Hinge (All Galvanized)', NULL);
+INSERT INTO products (id, product_name, description) VALUES (4, 'Dropside Lock Catcher Front (Dutro 302/422)', NULL);
+INSERT INTO products (id, product_name, description) VALUES (5, 'Gas Tank Cover - Medium', NULL);
+INSERT INTO products (id, product_name, description) VALUES (6, 'Stainless Seat Shoe Partition', NULL);
+INSERT INTO products (id, product_name, description) VALUES (7, 'Dropside Hinge Galvanized (FG8J) (4.5x100x145)', '(4.5x100x145)');
+INSERT INTO products (id, product_name, description) VALUES (8, 'Forged Lock T-Key', NULL);
+INSERT INTO products (id, product_name, description) VALUES (9, 'Windshield Center Post Plate', NULL);
+INSERT INTO products (id, product_name, description) VALUES (10, 'Stainless Forged Lock Cover with Oval Center', NULL);
+INSERT INTO products (id, product_name, description) VALUES (11, 'Lock, Baggage Forged LH/RH', NULL);
+INSERT INTO products (id, product_name, description) VALUES (12, 'T Battery Key', NULL);
+INSERT INTO products (id, product_name, description) VALUES (13, 'Tension Rod with NLW (16mm x 742) (Dutro WU422)', NULL);
+INSERT INTO products (id, product_name, description) VALUES (14, 'Barrel Bolt LBC', NULL);
 
 INSERT INTO purchase_order (order_number, customer_id, order_date)
 VALUES ('PO-2026-0001', 1, DATE '2026-03-01');

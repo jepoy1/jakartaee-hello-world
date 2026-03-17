@@ -29,14 +29,14 @@ class SalesInvoiceResourceApiTest {
     @Test
     void createSalesInvoiceCreatesInvoiceForValidRequest() {
         SalesInvoiceCreateItemDTO item = new SalesInvoiceCreateItemDTO();
-        item.setProductName("Laptop Dock");
+        item.setProductName("Stainless Hinge with Handle");
         item.setQuantity(1);
         item.setUnitPrice(125.50);
 
         SalesInvoiceDTO request = new SalesInvoiceDTO();
         request.setInvoiceNumber("SI-2026-API-001");
         request.setPurchaseOrderId(1L);
-        request.setCustomerName("Acme Trading");
+        request.setCustomerName("Centro Manufacturing");
         request.setInvoiceDate(LocalDate.of(2026, 3, 17));
         request.setSalesInvoiceItems(List.of(item));
 
@@ -45,7 +45,7 @@ class SalesInvoiceResourceApiTest {
         assertNotNull(response.getId());
         assertEquals("SI-2026-API-001", response.getInvoiceNumber());
         assertEquals(1L, response.getPurchaseOrderId());
-        assertEquals("Acme Trading", response.getCustomerName());
+        assertEquals("Centro Manufacturing", response.getCustomerName());
         assertEquals(1, response.getSalesInvoiceItems().size());
     }
 
