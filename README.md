@@ -17,6 +17,8 @@ the file to a [Jakarta EE compatible runtime](https://jakarta.ee/compatibility).
 ### WildFly Deployment Note
 - This app is configured with context root `/emw` via `src/main/webapp/WEB-INF/jboss-web.xml`.
 - Expected endpoint after deployment: `GET http://localhost:8080/emw/purchase-orders`.
+- Purchase order UI page: `http://localhost:8080/emw/`.
+- UI filters are sent as query parameters to the API (example: `http://localhost:8080/emw/?paymentStatus=ONGOING&customer=Centro`).
 - Build/redeploy command: `./mvnw package` (or `mvnw.cmd package` on Windows).
 - If `mvn clean` fails with file-lock errors under `target/server`, stop WildFly first, then run clean/package again.
 

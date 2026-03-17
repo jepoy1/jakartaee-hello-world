@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Orders</title>
+</head>
+<body>
+  <main>
+    <h1>Purchase Orders</h1>
+
+    <form id="filters" aria-label="Purchase order filters">
+      <label for="paymentStatus">Payment Status</label>
+      <select id="paymentStatus" name="paymentStatus">
+        <option value="">All</option>
+        <option value="ONGOING">ONGOING</option>
+        <option value="FULLY_PAID">FULLY_PAID</option>
+      </select>
+
+      <label for="customer">Customer</label>
+      <input id="customer" name="customer" type="text" placeholder="Customer name">
+
+      <button type="submit">Search</button>
+      <button type="button" id="clearFilters">Clear</button>
+    </form>
+
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Order Number</th>
+          <th>Customer</th>
+          <th>Order Date</th>
+          <th>Payment Status</th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </main>
+
+  <script>
+    const filtersForm = document.getElementById('filters');
+    const paymentStatusInput = document.getElementById('paymentStatus');
+    const customerInput = document.getElementById('customer');
+    const clearButton = document.getElementById('clearFilters');
+    const statusEl = document.getElementById('status');
+    const resultsBody = document.getElementById('resultsBody');
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    function renderRows(orders) {
+      resultsBody.replaceChildren();
+
+      if (!orders.length) {
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.colSpan = 5;
+        emptyCell.textContent = 'No purchase orders found.';
+        emptyRow.appendChild(emptyCell);
+        resultsBody.appendChild(emptyRow);
+        return;
+      }
+
+      orders.forEach((order) => {
+        const row = document.createElement('tr');
+
+        const idCell = document.createElement('td');
+        idCell.textContent = order.id ?? '';
+        row.appendChild(idCell);
+
+        const orderNumberCell = document.createElement('td');
+        orderNumberCell.textContent = order.orderNumber ?? '';
+        row.appendChild(orderNumberCell);
+
+        const customerCell = document.createElement('td');
+        customerCell.textContent = order.customerName ?? '';
+        row.appendChild(customerCell);
+
+        const orderDateCell = document.createElement('td');
+        orderDateCell.textContent = order.orderDate ?? '';
+        row.appendChild(orderDateCell);
+
+        const paymentStatusCell = document.createElement('td');
+        paymentStatusCell.textContent = order.paymentStatus ?? '';
+        row.appendChild(paymentStatusCell);
+
+        resultsBody.appendChild(row);
+      });
+    }
+
+    function buildQueryParams() {
+      const params = new URLSearchParams();
+      const paymentStatus = paymentStatusInput.value.trim();
+      const customer = customerInput.value.trim();
+
+      if (paymentStatus) {
+        params.set('paymentStatus', paymentStatus);
+      }
+
+      if (customer) {
+        params.set('customer', customer);
+      }
+
+      return params;
+    }
+
+    function applyQueryToInputs(searchParams) {
+      paymentStatusInput.value = searchParams.get('paymentStatus') ?? '';
+      customerInput.value = searchParams.get('customer') ?? '';
+    }
+
+    async function loadPurchaseOrders() {
+      const params = buildQueryParams();
+      const queryString = params.toString();
+      const requestUrl = queryString ? `purchase-orders?${queryString}` : 'purchase-orders';
+
+      setStatus('Loading purchase orders...');
+
+      try {
+        const response = await fetch(requestUrl, {
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || `Request failed with status ${response.status}`);
+        }
+
+        const orders = await response.json();
+        renderRows(Array.isArray(orders) ? orders : []);
+        setStatus(`Loaded ${Array.isArray(orders) ? orders.length : 0} purchase order(s).`);
+      } catch (error) {
+        renderRows([]);
+        setStatus(`Failed to load purchase orders: ${error.message}`);
+      }
+    }
+
+    filtersForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const params = buildQueryParams();
+      const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+
+      await loadPurchaseOrders();
+    });
+
+    clearButton.addEventListener('click', async () => {
+      paymentStatusInput.value = '';
+      customerInput.value = '';
+      window.history.replaceState({}, '', window.location.pathname);
+      await loadPurchaseOrders();
+    });
+
+    (function init() {
+      const currentParams = new URLSearchParams(window.location.search);
+      applyQueryToInputs(currentParams);
+      loadPurchaseOrders();
+    })();
+  </script>
+</body>
+</html>
