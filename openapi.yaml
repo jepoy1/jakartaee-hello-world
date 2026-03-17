@@ -130,6 +130,42 @@ paths:
                         unitPrice: 8.99
         '404':
           description: Purchase order not found
+  /sales-invoice:
+    post:
+      operationId: createSalesInvoice
+      tags:
+        - Sales Invoice
+      summary: Creates a sales invoice
+      description: Saves one sales invoice with invoice items.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesInvoiceDTO'
+            examples:
+              sample:
+                value:
+                  invoiceNumber: SI-2026-0003
+                  purchaseOrderId: 1
+                  customerName: Acme Trading
+                  invoiceDate: '2026-03-15'
+                  salesInvoiceItems:
+                    - productName: Laptop Dock
+                      quantity: 1
+                      unitPrice: 125.50
+                    - productName: USB-C Cable
+                      quantity: 2
+                      unitPrice: 8.99
+      responses:
+        '201':
+          description: Sales invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesInvoiceDTO'
+        '400':
+          description: Invalid request payload
 components:
   schemas:
     PurchaseOrderDTO:
@@ -222,6 +258,46 @@ components:
           type: integer
           format: int32
           example: 2
+        unitPrice:
+          type: number
+          format: double
+          example: 125.50
+    SalesInvoiceDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+          example: 1
+        invoiceNumber:
+          type: string
+          example: SI-2026-0003
+        purchaseOrderId:
+          type: integer
+          format: int64
+          example: 1
+        customerName:
+          type: string
+          example: Acme Trading
+        invoiceDate:
+          type: string
+          format: date
+          example: '2026-03-15'
+        salesInvoiceItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesInvoiceCreateItemDTO'
+    SalesInvoiceCreateItemDTO:
+      type: object
+      properties:
+        productName:
+          type: string
+          example: Laptop Dock
+        quantity:
+          type: integer
+          format: int32
+          example: 1
         unitPrice:
           type: number
           format: double

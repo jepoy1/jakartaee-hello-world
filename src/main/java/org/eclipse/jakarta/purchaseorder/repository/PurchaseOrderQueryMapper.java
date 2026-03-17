@@ -17,6 +17,7 @@ import org.eclipse.jakarta.purchaseorder.model.Customer;
 import org.eclipse.jakarta.purchaseorder.model.Product;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrder;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrderItem;
+import org.eclipse.jakarta.purchaseorder.model.SalesInvoice;
 import org.eclipse.jakarta.purchaseorder.model.SalesInvoiceItem;
 
 public interface PurchaseOrderQueryMapper {
@@ -91,6 +92,27 @@ public interface PurchaseOrderQueryMapper {
 
     @Select("SELECT p.id, p.product_name, p.description FROM products p WHERE p.id = #{id}")
     Product findProductById(@Param("id") Long id);
+
+    @Select("SELECT p.id, p.product_name, p.description FROM products p WHERE p.product_name = #{name}")
+    Product findProductByName(@Param("name") String name);
+
+    @Insert({
+        "INSERT INTO sales_invoice (invoice_number, purchase_order_id, customer_id, invoice_date, total_amount)",
+        "VALUES (#{invoiceNumber}, #{purchaseOrderId}, #{customerId}, #{invoiceDate}, #{totalAmount})"
+    })
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insertSalesInvoice(SalesInvoice salesInvoice);
+
+    @Insert({
+        "INSERT INTO sales_invoice_items (sales_invoice_id, product_id, quantity, unit_price)",
+        "VALUES (#{salesInvoiceId}, #{productId}, #{quantity}, #{unitPrice})"
+    })
+    int insertSalesInvoiceItem(
+        @Param("salesInvoiceId") Long salesInvoiceId,
+        @Param("productId") Long productId,
+        @Param("quantity") Integer quantity,
+        @Param("unitPrice") java.math.BigDecimal unitPrice
+    );
 
     @Select({
         "SELECT sii.id, sii.sales_invoice_id, sii.product_id, sii.quantity, sii.unit_price",

@@ -12,7 +12,9 @@ import java.util.List;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.eclipse.jakarta.purchaseorder.model.Customer;
+import org.eclipse.jakarta.purchaseorder.model.Product;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrder;
+import org.eclipse.jakarta.purchaseorder.model.SalesInvoiceItem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -137,5 +139,52 @@ class PurchaseOrderRepositoryTest {
 
         assertEquals(1L, customer.getId());
         assertEquals("contact@acmetrading.com", customer.getEmail());
+    }
+
+    @Test
+    void createSalesInvoicePersistsAndAffectsPaymentStatus() {
+        SalesInvoiceItem salesInvoiceItem = new SalesInvoiceItem();
+        Product product = new Product();
+        product.setProductName("Laptop Dock");
+        salesInvoiceItem.setProduct(product);
+        salesInvoiceItem.setQuantity(1);
+        salesInvoiceItem.setUnitPrice(new BigDecimal("125.50"));
+
+        var createdSalesInvoice = repository.createSalesInvoice(
+            "SI-2026-TEST",
+            1L,
+            "Acme Trading",
+            LocalDate.of(2026, 3, 16),
+            List.of(salesInvoiceItem)
+        );
+
+        assertNotNull(createdSalesInvoice.getId());
+
+        PurchaseOrder purchaseOrder = repository.findDetailById(1L).orElseThrow();
+        assertEquals(3, purchaseOrder.getSalesInvoiceItems().size());
+        assertEquals("FULLY_PAID", purchaseOrder.getPaymentStatus());
+    }
+
+    @Test
+    void createSalesInvoiceThrowsWhenCustomerDoesNotMatchPurchaseOrder() {
+        SalesInvoiceItem salesInvoiceItem = new SalesInvoiceItem();
+        Product product = new Product();
+        product.setProductName("Laptop Dock");
+        salesInvoiceItem.setProduct(product);
+        salesInvoiceItem.setQuantity(1);
+        salesInvoiceItem.setUnitPrice(new BigDecimal("125.50"));
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> repository.createSalesInvoice(
+                "SI-2026-INVALID",
+                1L,
+                "Blue River Supplies",
+                LocalDate.of(2026, 3, 16),
+                List.of(salesInvoiceItem)
+            )
+        );
+
+        assertEquals("customerName does not match purchaseOrderId: 1", exception.getMessage());
     }
 }

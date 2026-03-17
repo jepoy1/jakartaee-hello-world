@@ -4,6 +4,7 @@ import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,7 +15,10 @@ import java.util.logging.Logger;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.eclipse.jakarta.purchaseorder.model.Customer;
+import org.eclipse.jakarta.purchaseorder.model.Product;
 import org.eclipse.jakarta.purchaseorder.model.PurchaseOrder;
+import org.eclipse.jakarta.purchaseorder.model.SalesInvoice;
+import org.eclipse.jakarta.purchaseorder.model.SalesInvoiceItem;
 
 @Stateless
 public class PurchaseOrderRepository {
@@ -144,6 +148,69 @@ public class PurchaseOrderRepository {
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
             PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
             return Optional.ofNullable(mapper.findCustomerByName(name));
+        }
+    }
+
+    public SalesInvoice createSalesInvoice(
+        String invoiceNumber,
+        Long purchaseOrderId,
+        String customerName,
+        java.time.LocalDate invoiceDate,
+        List<SalesInvoiceItem> salesInvoiceItems
+    ) {
+        logger.info("Creating sales invoice " + invoiceNumber + " for purchaseOrderId " + purchaseOrderId);
+
+        try (SqlSession sqlSession = sqlSessionFactory.openSession(false)) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+
+            PurchaseOrder purchaseOrder = mapper.findPurchaseOrderById(purchaseOrderId);
+            if (purchaseOrder == null) {
+                throw new IllegalArgumentException("Unknown purchaseOrderId: " + purchaseOrderId);
+            }
+
+            Customer customer = mapper.findCustomerByName(customerName);
+            if (customer == null) {
+                throw new IllegalArgumentException("Unknown customerName: " + customerName);
+            }
+
+            if (!customer.getId().equals(purchaseOrder.getCustomer().getId())) {
+                throw new IllegalArgumentException(
+                    "customerName does not match purchaseOrderId: " + purchaseOrderId
+                );
+            }
+
+            BigDecimal totalAmount = salesInvoiceItems.stream()
+                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            SalesInvoice salesInvoice = new SalesInvoice();
+            salesInvoice.setInvoiceNumber(invoiceNumber);
+            salesInvoice.setPurchaseOrderId(purchaseOrderId);
+            salesInvoice.setCustomerId(customer.getId());
+            salesInvoice.setInvoiceDate(invoiceDate);
+            salesInvoice.setTotalAmount(totalAmount);
+            mapper.insertSalesInvoice(salesInvoice);
+
+            for (SalesInvoiceItem salesInvoiceItem : salesInvoiceItems) {
+                Product product = mapper.findProductByName(salesInvoiceItem.getProduct().getProductName());
+                if (product == null) {
+                    throw new IllegalArgumentException(
+                        "Unknown productName: " + salesInvoiceItem.getProduct().getProductName()
+                    );
+                }
+
+                mapper.insertSalesInvoiceItem(
+                    salesInvoice.getId(),
+                    product.getId(),
+                    salesInvoiceItem.getQuantity(),
+                    salesInvoiceItem.getUnitPrice()
+                );
+            }
+
+            sqlSession.commit();
+            return salesInvoice;
+        } catch (RuntimeException exception) {
+            throw exception;
         }
     }
 
