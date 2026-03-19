@@ -11,35 +11,56 @@
     <h1>Create Sales Invoice</h1>
     <a href="/emw/" class="back-link">&#8592; Back to Purchase Orders</a>
 
-    <div class="card">
-      <form id="salesInvoiceForm" aria-label="Create sales invoice form">
+    <form id="salesInvoiceForm" aria-label="Create sales invoice form">
+      <div class="card">
+        <h2>Search Purchase Order</h2>
+        <div class="form-stack">
+          <div class="form-field">
+            <label for="searchPurchaseOrderNumber">Purchase Order Number</label>
+            <input id="searchPurchaseOrderNumber" name="searchPurchaseOrderNumber" type="text" placeholder="PO-2026-0001">
+          </div>
+          <div class="form-field">
+            <label for="searchPurchaseOrderDate">Purchase Order Date</label>
+            <input id="searchPurchaseOrderDate" name="searchPurchaseOrderDate" type="date">
+          </div>
+          <div class="form-field">
+            <label for="searchCustomerName">Company</label>
+            <select id="searchCustomerName" name="searchCustomerName">
+              <option value="">Select company</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>&nbsp;</label>
+            <button type="button" id="searchPurchaseOrderButton" class="btn btn-secondary btn-sm">Search Purchase Order</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="salesInvoiceCard">
+        <h2>Sales Invoice Details</h2>
         <div class="form-stack">
           <div class="form-field">
             <label for="invoiceNumber">Invoice Number</label>
             <input id="invoiceNumber" name="invoiceNumber" type="text" required placeholder="SI-2026-0003">
           </div>
           <div class="form-field">
-            <label for="purchaseOrderNumber">Purchase Order Number</label>
-            <input id="purchaseOrderNumber" name="purchaseOrderNumber" type="text" required placeholder="PO-2026-0001">
-          </div>
-          <div class="form-field">
             <label for="customerName">Customer</label>
-            <select id="customerName" name="customerName" required>
+            <select id="customerName" name="customerName" required disabled>
               <option value="">Select customer</option>
             </select>
           </div>
-          <div class="form-field">
-            <label for="purchaseOrderDate">Purchase Order Date</label>
-            <input id="purchaseOrderDate" name="purchaseOrderDate" type="date" required>
-          </div>
-          <div class="form-field">
+          <div class="form-field" id="invoiceDateField">
             <label for="invoiceDate">Invoice Date</label>
             <input id="invoiceDate" name="invoiceDate" type="date" required>
           </div>
         </div>
 
-        <h2>Invoice Item</h2>
-        <div class="item-row">
+        <!-- Hidden fields to carry purchase order context from the search card -->
+        <input id="purchaseOrderNumber" name="purchaseOrderNumber" type="hidden">
+        <input id="purchaseOrderDate" name="purchaseOrderDate" type="hidden">
+
+        <h2 id="invoiceItemHeader">Invoice Item</h2>
+        <div class="item-row" id="invoiceItemRow">
           <div class="form-field">
             <label for="productName">Product</label>
             <input id="productName" name="productName" type="text" required placeholder="Stainless Hinge with Handle">
@@ -55,11 +76,11 @@
         </div>
 
         <div class="btn-group">
-          <button type="submit" class="btn btn-primary">Create Sales Invoice</button>
+          <button type="submit" id="submitButton" class="btn btn-primary" disabled>Create Sales Invoice</button>
           <button type="button" id="resetButton" class="btn btn-secondary">Reset</button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
 
     <p id="status" class="status-msg" role="status" aria-live="polite"></p>
   </main>
@@ -68,9 +89,34 @@
     const form = document.getElementById('salesInvoiceForm');
     const resetButton = document.getElementById('resetButton');
     const statusEl = document.getElementById('status');
+    const searchPurchaseOrderNumber = document.getElementById('searchPurchaseOrderNumber');
+    const searchPurchaseOrderDate = document.getElementById('searchPurchaseOrderDate');
+    const searchCustomerName = document.getElementById('searchCustomerName');
+    const submitButton = document.getElementById('submitButton');
+    const salesInvoiceCard = document.getElementById('salesInvoiceCard');
+    const searchPurchaseOrderButton = document.getElementById('searchPurchaseOrderButton');
+    const invoiceDateField = document.getElementById('invoiceDateField');
+    const invoiceItemHeader = document.getElementById('invoiceItemHeader');
+    const invoiceItemRow = document.getElementById('invoiceItemRow');
 
     function setStatus(message) {
       statusEl.textContent = message;
+    }
+
+    function hideInvoiceFields() {
+      salesInvoiceCard.classList.add('hidden');
+      invoiceDateField.classList.add('hidden');
+      invoiceItemHeader.classList.add('hidden');
+      invoiceItemRow.classList.add('hidden');
+      submitButton.disabled = true;
+    }
+
+    function showInvoiceFields() {
+      salesInvoiceCard.classList.remove('hidden');
+      invoiceDateField.classList.remove('hidden');
+      invoiceItemHeader.classList.remove('hidden');
+      invoiceItemRow.classList.remove('hidden');
+      submitButton.disabled = false;
     }
 
     async function loadCustomerOptions() {
@@ -90,22 +136,135 @@
           .filter((name) => typeof name === 'string' && name.trim().length > 0)
       )].sort((first, second) => first.localeCompare(second));
 
-      const selectedValue = form.customerName.value;
+      const invoiceSelectedValue = form.customerName.value;
+      const searchSelectedValue = searchCustomerName.value;
+
       form.customerName.replaceChildren();
+      searchCustomerName.replaceChildren();
 
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = 'Select customer';
-      form.customerName.appendChild(defaultOption);
+      const defaultInvoiceOption = document.createElement('option');
+      defaultInvoiceOption.value = '';
+      defaultInvoiceOption.textContent = 'Select customer';
+      form.customerName.appendChild(defaultInvoiceOption);
 
-      customers.forEach((customerName) => {
-        const option = document.createElement('option');
-        option.value = customerName;
-        option.textContent = customerName;
-        form.customerName.appendChild(option);
+      const defaultSearchOption = document.createElement('option');
+      defaultSearchOption.value = '';
+      defaultSearchOption.textContent = 'Select company';
+      searchCustomerName.appendChild(defaultSearchOption);
+
+      customers.forEach((customerNameValue) => {
+        const invoiceOption = document.createElement('option');
+        invoiceOption.value = customerNameValue;
+        invoiceOption.textContent = customerNameValue;
+        form.customerName.appendChild(invoiceOption);
+
+        const searchOption = document.createElement('option');
+        searchOption.value = customerNameValue;
+        searchOption.textContent = customerNameValue;
+        searchCustomerName.appendChild(searchOption);
       });
 
-      form.customerName.value = selectedValue;
+      form.customerName.value = invoiceSelectedValue;
+      searchCustomerName.value = searchSelectedValue;
+    }
+
+    async function searchPurchaseOrder() {
+      const purchaseOrderNumber = searchPurchaseOrderNumber.value.trim();
+      const purchaseOrderDate = searchPurchaseOrderDate.value;
+      const company = searchCustomerName.value;
+
+      if (!purchaseOrderNumber || !purchaseOrderDate || !company) {
+        alert('Please enter purchase order number, date, and company to search.');
+        return;
+      }
+
+      setStatus('Searching purchase order...');
+
+      try {
+        const response = await fetch('/emw/purchase-orders', {
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to search purchase orders with status ${response.status}`);
+        }
+
+        const purchaseOrders = await response.json();
+        const orders = Array.isArray(purchaseOrders) ? purchaseOrders : [];
+
+        const match = orders.find((order) => {
+          if (!order
+            || typeof order.orderNumber !== 'string'
+            || typeof order.customerName !== 'string'
+            || typeof order.orderDate !== 'string') {
+            return false;
+          }
+
+          return order.orderNumber.trim() === purchaseOrderNumber
+            && order.orderDate === purchaseOrderDate
+            && order.customerName === company;
+        });
+
+        if (!match) {
+          hideInvoiceFields();
+          form.purchaseOrderDate.value = '';
+          form.purchaseOrderNumber.value = '';
+          form.customerName.value = '';
+          form.productName.value = '';
+          form.quantity.value = '';
+          form.unitPrice.value = '';
+          setStatus('');
+          alert('Purchase order does not exist.');
+          return;
+        }
+
+        if (match.orderDate) {
+          form.purchaseOrderDate.value = match.orderDate;
+        }
+
+        if (match.customerName) {
+          form.customerName.value = match.customerName;
+        }
+
+        // Carry the searched purchase order number into the hidden field
+        form.purchaseOrderNumber.value = purchaseOrderNumber;
+
+        try {
+          const detailResponse = await fetch(`/emw/purchase-orders/${encodeURIComponent(match.id)}`, {
+            headers: {
+              Accept: 'application/json'
+            }
+          });
+
+          if (detailResponse.ok) {
+            const detail = await detailResponse.json();
+            const items = Array.isArray(detail.purchaseItems) ? detail.purchaseItems : [];
+            const firstItem = items.length > 0 ? items[0] : null;
+
+            if (firstItem) {
+              if (typeof firstItem.productName === 'string') {
+                form.productName.value = firstItem.productName;
+              }
+              if (typeof firstItem.quantity === 'number') {
+                form.quantity.value = String(firstItem.quantity);
+              }
+              if (typeof firstItem.unitPrice === 'number') {
+                form.unitPrice.value = String(firstItem.unitPrice);
+              }
+            }
+          }
+        } catch (error) {
+          // If prefill fails, leave item fields as-is but still allow invoicing
+        }
+
+        showInvoiceFields();
+        setStatus(`Purchase order ${match.orderNumber} found. You can now enter invoice details.`);
+      } catch (error) {
+        hideInvoiceFields();
+        setStatus(`Failed to search purchase order: ${error.message}`);
+      }
     }
 
     form.addEventListener('submit', async (event) => {
@@ -156,11 +315,20 @@
     resetButton.addEventListener('click', () => {
       form.reset();
       setStatus('');
+      hideInvoiceFields();
+      searchPurchaseOrderNumber.value = '';
+      searchPurchaseOrderDate.value = '';
+      searchCustomerName.value = '';
+    });
+
+    searchPurchaseOrderButton.addEventListener('click', () => {
+      searchPurchaseOrder();
     });
 
     (async function init() {
       try {
         await loadCustomerOptions();
+        hideInvoiceFields();
       } catch (error) {
         setStatus(`Failed to load customers: ${error.message}`);
       }

@@ -372,3 +372,10 @@ a.action-link:hover {
 #addItemButton {
   margin-top: 4px;
 }
+
+/* ==============================================
+   Utilities
+   ============================================== */
+.hidden {
+  display: none !important;
+}
