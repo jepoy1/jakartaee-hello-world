@@ -59,21 +59,9 @@
         <input id="purchaseOrderNumber" name="purchaseOrderNumber" type="hidden">
         <input id="purchaseOrderDate" name="purchaseOrderDate" type="hidden">
 
-        <h2 id="invoiceItemHeader">Invoice Item</h2>
-        <div class="item-row" id="invoiceItemRow">
-          <div class="form-field">
-            <label for="productName">Product</label>
-            <input id="productName" name="productName" type="text" required placeholder="Stainless Hinge with Handle">
-          </div>
-          <div class="form-field">
-            <label for="quantity">Quantity</label>
-            <input id="quantity" name="quantity" type="number" min="1" required placeholder="1">
-          </div>
-          <div class="form-field">
-            <label for="unitPrice">Unit Price</label>
-            <input id="unitPrice" name="unitPrice" type="number" min="0" step="0.01" required placeholder="125.50">
-          </div>
-        </div>
+        <h2 id="invoiceItemHeader">Invoice Items</h2>
+        <div id="invoiceItemsContainer"></div>
+        <button type="button" id="addInvoiceItemButton" class="btn btn-secondary btn-sm">+ Add Item</button>
 
         <div class="btn-group">
           <button type="submit" id="submitButton" class="btn btn-primary" disabled>Create Sales Invoice</button>
@@ -97,7 +85,9 @@
     const searchPurchaseOrderButton = document.getElementById('searchPurchaseOrderButton');
     const invoiceDateField = document.getElementById('invoiceDateField');
     const invoiceItemHeader = document.getElementById('invoiceItemHeader');
-    const invoiceItemRow = document.getElementById('invoiceItemRow');
+    const invoiceItemsContainer = document.getElementById('invoiceItemsContainer');
+    const addInvoiceItemButton = document.getElementById('addInvoiceItemButton');
+    let invoiceProductNames = [];
 
     function setStatus(message) {
       statusEl.textContent = message;
@@ -107,7 +97,8 @@
       salesInvoiceCard.classList.add('hidden');
       invoiceDateField.classList.add('hidden');
       invoiceItemHeader.classList.add('hidden');
-      invoiceItemRow.classList.add('hidden');
+      invoiceItemsContainer.classList.add('hidden');
+      addInvoiceItemButton.classList.add('hidden');
       submitButton.disabled = true;
     }
 
@@ -115,8 +106,96 @@
       salesInvoiceCard.classList.remove('hidden');
       invoiceDateField.classList.remove('hidden');
       invoiceItemHeader.classList.remove('hidden');
-      invoiceItemRow.classList.remove('hidden');
+      invoiceItemsContainer.classList.remove('hidden');
+      addInvoiceItemButton.classList.remove('hidden');
       submitButton.disabled = false;
+    }
+
+    function createInvoiceProductSelect(selectedProductName = '') {
+      const productSelect = document.createElement('select');
+      productSelect.className = 'invoice-item-product';
+      productSelect.required = true;
+
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Select product';
+      productSelect.appendChild(defaultOption);
+
+      invoiceProductNames.forEach((productName) => {
+        const option = document.createElement('option');
+        option.value = productName;
+        option.textContent = productName;
+        productSelect.appendChild(option);
+      });
+
+      productSelect.value = selectedProductName;
+      return productSelect;
+    }
+
+    function createInvoiceItemRow(item = {}) {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+
+      const productField = document.createElement('div');
+      productField.className = 'form-field';
+      const productLabel = document.createElement('label');
+      productLabel.textContent = 'Product';
+      productField.appendChild(productLabel);
+      const productSelect = createInvoiceProductSelect(item.productName ?? '');
+      productField.appendChild(productSelect);
+      row.appendChild(productField);
+
+      const qtyField = document.createElement('div');
+      qtyField.className = 'form-field';
+      const quantityLabel = document.createElement('label');
+      quantityLabel.textContent = 'Quantity';
+      qtyField.appendChild(quantityLabel);
+      const quantityInput = document.createElement('input');
+      quantityInput.type = 'number';
+      quantityInput.className = 'invoice-item-quantity';
+      quantityInput.min = '1';
+      quantityInput.required = true;
+      quantityInput.placeholder = '1';
+      quantityInput.value = item.quantity ?? '';
+      qtyField.appendChild(quantityInput);
+      row.appendChild(qtyField);
+
+      const priceField = document.createElement('div');
+      priceField.className = 'form-field';
+      const unitPriceLabel = document.createElement('label');
+      unitPriceLabel.textContent = 'Unit Price';
+      priceField.appendChild(unitPriceLabel);
+      const unitPriceInput = document.createElement('input');
+      unitPriceInput.type = 'number';
+      unitPriceInput.className = 'invoice-item-unit-price';
+      unitPriceInput.min = '0';
+      unitPriceInput.step = '0.01';
+      unitPriceInput.required = true;
+      unitPriceInput.placeholder = '125.50';
+      unitPriceInput.value = item.unitPrice ?? '';
+      priceField.appendChild(unitPriceInput);
+      row.appendChild(priceField);
+
+      const removeButton = document.createElement('button');
+      removeButton.type = 'button';
+      removeButton.className = 'btn btn-danger btn-sm';
+      removeButton.textContent = 'Remove';
+      removeButton.addEventListener('click', () => {
+        if (invoiceItemsContainer.children.length > 1) {
+          row.remove();
+        }
+      });
+      row.appendChild(removeButton);
+
+      invoiceItemsContainer.appendChild(row);
+    }
+
+    function readInvoiceItemsFromForm() {
+      return [...invoiceItemsContainer.children].map((row) => ({
+        productName: row.querySelector('.invoice-item-product').value.trim(),
+        quantity: Number(row.querySelector('.invoice-item-quantity').value),
+        unitPrice: Number(row.querySelector('.invoice-item-unit-price').value)
+      }));
     }
 
     async function loadCustomerOptions() {
@@ -168,6 +247,34 @@
       searchCustomerName.value = searchSelectedValue;
     }
 
+    async function loadInvoiceProductOptions() {
+      const response = await fetch('/emw/products', {
+        headers: {
+          Accept: 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to load products with status ${response.status}`);
+      }
+
+      const productNameValues = await response.json();
+      invoiceProductNames = [...new Set(
+        (Array.isArray(productNameValues) ? productNameValues : [])
+          .filter((name) => typeof name === 'string' && name.trim().length > 0)
+      )].sort((first, second) => first.localeCompare(second));
+
+      const currentItems = readInvoiceItemsFromForm();
+      invoiceItemsContainer.replaceChildren();
+
+      if (currentItems.length === 0) {
+        createInvoiceItemRow();
+        return;
+      }
+
+      currentItems.forEach((item) => createInvoiceItemRow(item));
+    }
+
     async function searchPurchaseOrder() {
       const purchaseOrderNumber = searchPurchaseOrderNumber.value.trim();
       const purchaseOrderDate = searchPurchaseOrderDate.value;
@@ -212,9 +319,8 @@
           form.purchaseOrderDate.value = '';
           form.purchaseOrderNumber.value = '';
           form.customerName.value = '';
-          form.productName.value = '';
-          form.quantity.value = '';
-          form.unitPrice.value = '';
+          invoiceItemsContainer.replaceChildren();
+          createInvoiceItemRow();
           setStatus('');
           alert('Purchase order does not exist.');
           return;
@@ -241,18 +347,19 @@
           if (detailResponse.ok) {
             const detail = await detailResponse.json();
             const items = Array.isArray(detail.purchaseItems) ? detail.purchaseItems : [];
-            const firstItem = items.length > 0 ? items[0] : null;
 
-            if (firstItem) {
-              if (typeof firstItem.productName === 'string') {
-                form.productName.value = firstItem.productName;
-              }
-              if (typeof firstItem.quantity === 'number') {
-                form.quantity.value = String(firstItem.quantity);
-              }
-              if (typeof firstItem.unitPrice === 'number') {
-                form.unitPrice.value = String(firstItem.unitPrice);
-              }
+            invoiceItemsContainer.replaceChildren();
+
+            if (items.length === 0) {
+              createInvoiceItemRow();
+            } else {
+              items.forEach((item) => {
+                createInvoiceItemRow({
+                  productName: item.productName,
+                  quantity: item.quantity,
+                  unitPrice: item.unitPrice
+                });
+              });
             }
           }
         } catch (error) {
@@ -276,13 +383,7 @@
         customerName: form.customerName.value,
         purchaseOrderDate: form.purchaseOrderDate.value,
         invoiceDate: form.invoiceDate.value,
-        salesInvoiceItems: [
-          {
-            productName: form.productName.value.trim(),
-            quantity: Number(form.quantity.value),
-            unitPrice: Number(form.unitPrice.value)
-          }
-        ]
+        salesInvoiceItems: readInvoiceItemsFromForm()
       };
 
       setStatus('Creating sales invoice...');
@@ -319,15 +420,22 @@
       searchPurchaseOrderNumber.value = '';
       searchPurchaseOrderDate.value = '';
       searchCustomerName.value = '';
+      invoiceItemsContainer.replaceChildren();
+      createInvoiceItemRow();
     });
 
     searchPurchaseOrderButton.addEventListener('click', () => {
       searchPurchaseOrder();
     });
 
+    addInvoiceItemButton.addEventListener('click', () => {
+      createInvoiceItemRow();
+    });
+
     (async function init() {
       try {
         await loadCustomerOptions();
+        await loadInvoiceProductOptions();
         hideInvoiceFields();
       } catch (error) {
         setStatus(`Failed to load customers: ${error.message}`);
