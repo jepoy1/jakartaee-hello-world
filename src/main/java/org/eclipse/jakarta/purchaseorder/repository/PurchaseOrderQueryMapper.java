@@ -80,6 +80,10 @@ public interface PurchaseOrderQueryMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insertPurchaseOrder(PurchaseOrder purchaseOrder);
 
+    @Insert("INSERT INTO customer (name, email) VALUES (#{name}, #{email})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insertCustomer(Customer customer);
+
         @Insert({
             "INSERT INTO purchase_order_items (purchase_order_id, product_id, quantity, unit_price)",
             "VALUES (#{purchaseOrderId}, #{productId}, #{quantity}, #{unitPrice})"

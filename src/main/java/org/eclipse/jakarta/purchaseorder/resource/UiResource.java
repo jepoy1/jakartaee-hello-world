@@ -54,6 +54,13 @@ public class UiResource {
     }
 
     @GET
+    @Path("create-company.html")
+    @Produces(MediaType.TEXT_HTML)
+    public Response getCreateCompanyPage() {
+        return pageResponse("/create-company.html", "Create company page not found");
+    }
+
+    @GET
     @Path("style.css")
     @Produces("text/css")
     public Response getStylesheet() {

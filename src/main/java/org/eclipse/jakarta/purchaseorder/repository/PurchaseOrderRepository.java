@@ -46,6 +46,21 @@ public class PurchaseOrderRepository {
         return purchaseOrder;
     }
 
+    public Customer createCustomer(String name, String email) {
+        logger.info("Creating customer " + name);
+
+        Customer customer = new Customer();
+        customer.setName(name);
+        customer.setEmail(email);
+
+        try (SqlSession sqlSession = sqlSessionFactory.openSession(true)) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+            mapper.insertCustomer(customer);
+        }
+
+        return customer;
+    }
+
     public PurchaseOrder createWithItems(PurchaseOrder purchaseOrder, List<PurchaseOrderItem> items) {
         logger.info("Creating purchase order with items " + purchaseOrder.getOrderNumber());
         try (SqlSession sqlSession = sqlSessionFactory.openSession(false)) {

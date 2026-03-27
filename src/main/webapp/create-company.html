@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Company</title>
+  <link rel="stylesheet" href="/emw/style.css">
+</head>
+<body>
+  <main>
+    <h1>Create Company</h1>
+    <a href="/emw/" class="back-link">&#8592; Back to Purchase Orders</a>
+
+    <div class="card">
+      <form id="companyForm" aria-label="Create company form">
+        <div class="form-stack">
+          <div class="form-field">
+            <label for="companyName">Company Name</label>
+            <input id="companyName" name="companyName" type="text" required placeholder="Centro Manufacturing">
+          </div>
+          <div class="form-field">
+            <label for="companyEmail">Email (optional)</label>
+            <input id="companyEmail" name="companyEmail" type="email" placeholder="contact@example.com">
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button type="submit" class="btn btn-primary">Create Company</button>
+          <button type="button" id="resetButton" class="btn btn-secondary">Reset</button>
+        </div>
+      </form>
+    </div>
+
+    <p id="status" class="status-msg" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const form = document.getElementById('companyForm');
+    const resetButton = document.getElementById('resetButton');
+    const statusEl = document.getElementById('status');
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const name = form.companyName.value.trim();
+      const emailRaw = form.companyEmail.value;
+      const email = emailRaw && emailRaw.trim().length > 0 ? emailRaw.trim() : null;
+
+      const payload = { name, email };
+
+      setStatus('Creating company...');
+
+      try {
+        const response = await fetch('/emw/customers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || `Request failed with status ${response.status}`);
+        }
+
+        const created = await response.json();
+        const createdName = created && created.name ? created.name : name;
+        setStatus(`Created company ${createdName}.`);
+        alert(`Company ${createdName} created successfully.`);
+        form.reset();
+        window.location.href = '/emw/';
+      } catch (error) {
+        setStatus(`Failed to create company: ${error.message}`);
+      }
+    });
+
+    resetButton.addEventListener('click', () => {
+      form.reset();
+      setStatus('');
+    });
+  </script>
+</body>
+</html>
