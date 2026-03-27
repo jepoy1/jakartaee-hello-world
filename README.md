@@ -20,7 +20,15 @@ the file to a [Jakarta EE compatible runtime](https://jakarta.ee/compatibility).
 - Purchase order UI page: `http://localhost:8080/emw/`.
 - UI filters are sent as query parameters to the API (example: `http://localhost:8080/emw/?paymentStatus=ONGOING&customer=Centro`).
 - Build/redeploy command: `./mvnw package` (or `mvnw.cmd package` on Windows).
+- Local run command after a clean build: `./mvnw clean package wildfly:run` (or `mvnw.cmd clean package wildfly:run` on Windows).
+- If you already have a provisioned `target/server`, you can restart it with `./mvnw wildfly:run`, but after `clean` you need the combined command so Maven recreates the server and datasource first.
 - If `mvn clean` fails with file-lock errors under `target/server`, stop WildFly first, then run clean/package again.
+- Maven now applies the local MySQL datasource automatically during `./mvnw package` by running `wildfly/create-purchase-order-datasource.cli` against the provisioned `target/server` tree.
+- Maven also copies the MySQL JDBC driver into `target/wildfly-drivers` before that CLI script runs, so the WildFly module can be created locally during the same build.
+- The datasource name is `java:jboss/datasources/PurchaseOrderDS`, and the default JDBC URL is `jdbc:mysql://localhost:3306/emw?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC`.
+- Override the defaults with Maven properties if needed: `-Dmysql.url=... -Dmysql.user=... -Dmysql.password=...`.
+- The MySQL JDBC driver is downloaded through Maven and installed into the provisioned WildFly server by the same workflow.
+- `src/main/resources/META-INF/initial-data.sql` remains the seed script for the sample rows.
 
 ### Repository Tests
 - Repository tests run against an in-memory H2 database configured in MySQL compatibility mode.

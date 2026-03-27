@@ -4,11 +4,9 @@
              xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_1.xsd"
              version="3.1">
     <persistence-unit name="helloPU" transaction-type="JTA">
-        <jta-data-source>java:jboss/datasources/ExampleDS</jta-data-source>
+        <jta-data-source>java:jboss/datasources/PurchaseOrderDS</jta-data-source>
         <properties>
-            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
-            <property name="jakarta.persistence.sql-load-script-source" value="META-INF/initial-data.sql"/>
-            <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.schema.internal.script.MultiLineSqlScriptExtractor"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
             <property name="eclipselink.logging.level.sql" value="FINE" />
             <property name="eclipselink.logging.parameters" value="true" />
             <property name="hibernate.show_sql" value="true"/>

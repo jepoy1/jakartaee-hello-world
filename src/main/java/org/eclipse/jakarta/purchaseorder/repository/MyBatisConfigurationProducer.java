@@ -15,7 +15,7 @@ import jakarta.enterprise.inject.Produces;
 @ApplicationScoped
 public class MyBatisConfigurationProducer {
 
-    @Resource(lookup = "java:jboss/datasources/ExampleDS")
+    @Resource(lookup = "java:jboss/datasources/PurchaseOrderDS")
     private DataSource dataSource;
 
     @Produces
