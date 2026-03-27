@@ -46,6 +46,12 @@ h2 {
   margin: 24px 0 12px;
 }
 
+.page-intro {
+  max-width: 720px;
+  color: #4b5563;
+  margin-bottom: 20px;
+}
+
 /* ==============================================
    Navigation
    ============================================== */
@@ -268,6 +274,56 @@ tbody tr:last-child td {
 
 tbody tr:hover {
   background: #f9fafb;
+}
+
+.catalog-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.catalog-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fafb 100%);
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.catalog-item .catalog-label {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.catalog-item .catalog-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.4;
+}
+
+.catalog-toolbar {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.catalog-toolbar .form-field {
+  min-width: min(100%, 320px);
+}
+
+.catalog-count {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-left: auto;
 }
 
 /* Key-value detail table */

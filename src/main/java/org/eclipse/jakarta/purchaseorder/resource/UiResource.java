@@ -61,6 +61,20 @@ public class UiResource {
     }
 
     @GET
+    @Path("create-products.html")
+    @Produces(MediaType.TEXT_HTML)
+    public Response getCreateProductsPage() {
+        return pageResponse("/create-products.html", "Create products page not found");
+    }
+
+    @GET
+    @Path("products.html")
+    @Produces(MediaType.TEXT_HTML)
+    public Response getProductsPage() {
+        return pageResponse("/products.html", "Products page not found");
+    }
+
+    @GET
     @Path("style.css")
     @Produces("text/css")
     public Response getStylesheet() {

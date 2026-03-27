@@ -113,6 +113,10 @@ public interface PurchaseOrderQueryMapper {
     @Select("SELECT p.product_name FROM products p ORDER BY p.product_name")
     List<String> findAllProductNames();
 
+    @Insert("INSERT INTO products (product_name, description) VALUES (#{productName}, #{description})")
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insertProduct(Product product);
+
     @Select({
         "SELECT poi.id, poi.purchase_order_id, poi.product_id, poi.quantity, poi.unit_price",
         "FROM purchase_order_items poi",

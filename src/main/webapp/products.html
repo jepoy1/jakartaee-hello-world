@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products</title>
+  <link rel="stylesheet" href="/emw/style.css">
+</head>
+<body>
+  <main>
+    <h1>Products</h1>
+    <p class="page-intro">Browse the current product catalog used by purchase orders and sales invoices.</p>
+
+    <nav class="nav">
+      <a href="/emw/">Purchase Orders</a>
+      <span class="sep">|</span>
+      <a href="/emw/create-purchase-order.html">Create Purchase Order</a>
+      <span class="sep">|</span>
+      <a href="/emw/create-sales-invoice.html">Create Sales Invoice</a>
+      <span class="sep">|</span>
+      <a href="/emw/create-company.html">Create Company</a>
+      <span class="sep">|</span>
+      <a href="/emw/create-products.html">Create Product</a>
+    </nav>
+
+    <div class="card">
+      <div class="catalog-toolbar">
+        <div class="form-field">
+          <label for="productSearch">Search Products</label>
+          <input id="productSearch" type="text" placeholder="Type a product name">
+        </div>
+        <p id="productCount" class="catalog-count"></p>
+      </div>
+
+      <ul id="productList" class="catalog-list" aria-label="Product catalog"></ul>
+    </div>
+
+    <p id="status" class="status-msg" role="status" aria-live="polite"></p>
+  </main>
+
+  <script>
+    const productSearch = document.getElementById('productSearch');
+    const productCount = document.getElementById('productCount');
+    const productList = document.getElementById('productList');
+    const statusEl = document.getElementById('status');
+
+    let allProducts = [];
+
+    function setStatus(message) {
+      statusEl.textContent = message;
+    }
+
+    function renderProducts(products) {
+      productList.replaceChildren();
+
+      if (!products.length) {
+        const emptyItem = document.createElement('li');
+        emptyItem.className = 'catalog-item';
+        emptyItem.textContent = 'No products found.';
+        productList.appendChild(emptyItem);
+        productCount.textContent = '0 products';
+        return;
+      }
+
+      products.forEach((productName, index) => {
+        const item = document.createElement('li');
+        item.className = 'catalog-item';
+
+        const label = document.createElement('span');
+        label.className = 'catalog-label';
+        label.textContent = `Product ${index + 1}`;
+        item.appendChild(label);
+
+        const name = document.createElement('div');
+        name.className = 'catalog-name';
+        name.textContent = productName;
+        item.appendChild(name);
+
+        productList.appendChild(item);
+      });
+
+      productCount.textContent = `${products.length} product${products.length === 1 ? '' : 's'}`;
+    }
+
+    function filterProducts() {
+      const query = productSearch.value.trim().toLowerCase();
+      const filtered = query
+        ? allProducts.filter((productName) => productName.toLowerCase().includes(query))
+        : allProducts;
+
+      renderProducts(filtered);
+    }
+
+    async function loadProducts() {
+      setStatus('Loading products...');
+
+      try {
+        const response = await fetch('/emw/products', {
+          headers: {
+            Accept: 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || `Request failed with status ${response.status}`);
+        }
+
+        const productNames = await response.json();
+        allProducts = [...new Set(
+          (Array.isArray(productNames) ? productNames : [])
+            .filter((name) => typeof name === 'string' && name.trim().length > 0)
+            .map((name) => name.trim())
+        )].sort((first, second) => first.localeCompare(second));
+
+        filterProducts();
+        setStatus(`Loaded ${allProducts.length} product${allProducts.length === 1 ? '' : 's'}.`);
+      } catch (error) {
+        allProducts = [];
+        renderProducts([]);
+        setStatus(`Failed to load products: ${error.message}`);
+      }
+    }
+
+    productSearch.addEventListener('input', filterProducts);
+
+    loadProducts();
+  </script>
+</body>
+</html>

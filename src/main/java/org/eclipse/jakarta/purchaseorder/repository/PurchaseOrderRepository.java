@@ -212,6 +212,21 @@ public class PurchaseOrderRepository {
         }
     }
 
+    public Product createProduct(String productName, String description) {
+        logger.info("Creating product " + productName);
+
+        Product product = new Product();
+        product.setProductName(productName);
+        product.setDescription(description);
+
+        try (SqlSession sqlSession = sqlSessionFactory.openSession(true)) {
+            PurchaseOrderQueryMapper mapper = sqlSession.getMapper(PurchaseOrderQueryMapper.class);
+            mapper.insertProduct(product);
+        }
+
+        return product;
+    }
+
     public SalesInvoice createSalesInvoice(
         String invoiceNumber,
         String purchaseOrderNumber,
