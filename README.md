@@ -26,7 +26,9 @@ the file to a [Jakarta EE compatible runtime](https://jakarta.ee/compatibility).
 - Maven now applies the local MySQL datasource automatically during `./mvnw package` by running `wildfly/create-purchase-order-datasource.cli` against the provisioned `target/server` tree.
 - Maven also copies the MySQL JDBC driver into `target/wildfly-drivers` before that CLI script runs, so the WildFly module can be created locally during the same build.
 - The datasource name is `java:jboss/datasources/PurchaseOrderDS`, and the default JDBC URL is `jdbc:mysql://localhost:3306/emw?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC`.
-- Override the defaults with Maven properties if needed: `-Dmysql.url=... -Dmysql.user=... -Dmysql.password=...`.
+- MySQL credentials are no longer stored in the repository. Set `MYSQL_USER` and `MYSQL_PASSWORD` in your shell before running `mvnw.cmd clean package wildfly:run`.
+- Optionally set `MYSQL_URL` if you want a different JDBC URL than the default.
+- PowerShell example: `$env:MYSQL_USER="root"` and `$env:MYSQL_PASSWORD="your-password"`.
 - The MySQL JDBC driver is downloaded through Maven and installed into the provisioned WildFly server by the same workflow.
 - `src/main/resources/META-INF/initial-data.sql` remains the seed script for the sample rows.
 

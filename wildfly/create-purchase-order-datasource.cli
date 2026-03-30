@@ -3,7 +3,11 @@ embed-server --std-out=echo --server-config=standalone.xml
 if (outcome != success) of /subsystem=datasources/data-source=PurchaseOrderDS:read-resource
     module add --name=com.mysql --resources=target/wildfly-drivers/mysql-connector-j-8.4.0.jar
     /subsystem=datasources/jdbc-driver=mysql:add(driver-name=mysql,driver-module-name=com.mysql,driver-class-name=com.mysql.cj.jdbc.Driver)
-    /subsystem=datasources/data-source=PurchaseOrderDS:add(jndi-name=java:jboss/datasources/PurchaseOrderDS,enabled=true,use-java-context=true,driver-name=mysql,connection-url="jdbc:mysql://localhost:3306/emw?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",user-name="root",password="Ar96etr93_")
+    /subsystem=datasources/data-source=PurchaseOrderDS:add(jndi-name=java:jboss/datasources/PurchaseOrderDS,enabled=true,use-java-context=true,driver-name=mysql,connection-url="${env.MYSQL_URL:jdbc:mysql://localhost:3306/emw?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}",user-name="${env.MYSQL_USER}",password="${env.MYSQL_PASSWORD}")
+else
+    /subsystem=datasources/data-source=PurchaseOrderDS:write-attribute(name=connection-url,value="${env.MYSQL_URL:jdbc:mysql://localhost:3306/emw?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}")
+    /subsystem=datasources/data-source=PurchaseOrderDS:write-attribute(name=user-name,value="${env.MYSQL_USER}")
+    /subsystem=datasources/data-source=PurchaseOrderDS:write-attribute(name=password,value="${env.MYSQL_PASSWORD}")
 end-if
 
 stop-embedded-server

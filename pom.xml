@@ -29,8 +29,6 @@
         <war-plugin.version>3.4.0</war-plugin.version>
         <mysql.connector.version>8.4.0</mysql.connector.version>
         <mysql.url>jdbc:mysql://localhost:3306/emw?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=UTC</mysql.url>
-        <mysql.user>root</mysql.user>
-        <mysql.password>Ar96etr93_</mysql.password>
         <wildfly-maven-plugin.version>5.1.5.Final</wildfly-maven-plugin.version>
         <openapi-generator-maven-plugin.version>7.8.0</openapi-generator-maven-plugin.version>
     </properties>
@@ -201,7 +199,6 @@
                             <offline>true</offline>
                             <failOnError>false</failOnError>
                             <jbossHome>${project.build.directory}/server</jbossHome>
-                            <resolveExpressions>true</resolveExpressions>
                             <scripts>
                                 <script>${project.basedir}/wildfly/create-purchase-order-datasource.cli</script>
                             </scripts>
